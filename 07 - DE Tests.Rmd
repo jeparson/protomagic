@@ -6,10 +6,11 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(cache = TRUE)#have to cache for some of this DE to be iteratively useful.
 ```
 
-Now to calculate Differential expression.
+Now to calculate differential expression.
 
 We need to subselect various replicates of each type of sample.
 ```{r,echo=TRUE}
@@ -22,6 +23,16 @@ choosesamples<-function(types){
   
   
   
+}
+
+```
+We then need to do DE testing of various pairwise comparisons.
+
+```{r,echo=FALSE}
+DEdata<-DESeq2::DESeqDataSet(countData = mastercounts,colData=colnames(expdesign),design = tabletodeseq(expdesign))
+
+tabletodeseq<-function(table){
+  #convert the tabular design of the experimental design file into an experimental design that DESeq understands...
 }
 
 ```
