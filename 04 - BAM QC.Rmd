@@ -1,0 +1,27 @@
+---
+title: "04 - BAM QC"
+author: "jerod"
+date: "June 29, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This is a chance to run some of the read-level QC tools & view their outputs:
+
+1 - Picard RNASeqMetrics 
+2 - RNASEQC
+* Coverage Plots
+* GC Content plot
+
+3 - ERCC Dashboard
+* Dashboard Plots
+
+```{r}
+# This will likely take a reasonable amount of energy.  Picard is a cloud app, 
+# but ERCC Dashboard and RNASEQC are not.  Dashboard scripts can either be run via dockers
+# or done locally.  RNASEQC has an API available on the broad's "genepattern" cloud.
+
+```

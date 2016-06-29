@@ -1,0 +1,20 @@
+---
+title: "03 - Alignment"
+author: "jerod"
+date: "June 29, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+After looking at our Fastq files, we want to do the actual alignment and quantitation.
+
+```{r}
+#
+#define the correct input files:  fastq, genomefastalist, GTFfile*
+#run STAR on 7bg cloud 
+#save the appropriate output files: transcriptome_aligned_reads , reads_per_gene
+
+````

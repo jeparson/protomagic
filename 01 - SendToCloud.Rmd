@@ -19,12 +19,12 @@ Second we need to collect some metadata.  Fill out the table metadatatable.txt w
 appropriate to your site:
 
 ```{R}
-fastqmetadata<-read.table(file="metadatatable.txt",sep="\t",stringsAsFactors = FALSE,header = TRUE)
 
 ```
 
 Then we need to upload them to the cloud for processing.  Auto-Upload is causing an issue.
 ```{r, echo=FALSE}
+fastqmetadata<-read.table(file="metadatatable.txt",sep="\t",stringsAsFactors = FALSE,header = TRUE)
 ##my api token.  Will need to update before doing any major processing [but should be okay for this 1 HS run]
 require(sevenbridges)
 sevenbridgesapitoken="68916d51f8ba48c1a87a47f135bafef0"
@@ -35,7 +35,7 @@ p<-a$project(name = "prototypeercc2")
 require("devtools")||install.packages("devtools");require("devtools")
 require("sevenbridges")#available on bioconductor
 for(fastq in fastqlist){
-p$upload(filename = )
+p$upload(filename = fastq,metadata=)
 }
 #check that the file was successfully uploaded
 ```
