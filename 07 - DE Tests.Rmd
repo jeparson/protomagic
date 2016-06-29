@@ -1,0 +1,27 @@
+---
+title: "07 - DE Testing"
+author: "jerod"
+date: "June 29, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Now to calculate Differential expression.
+
+We need to subselect various replicates of each type of sample.
+```{r,echo=TRUE}
+#Some code to select samples simply
+choosesamples<-function(types){
+  #picks out the samples of the chosen types:
+  #loads the experimental design document off of cloud [[this doesn't exist yet]]
+  experimentaldesignfile="url.to.file"
+    expdesign<-read.table(experimentaldesignfile,sep="\t")
+  
+  
+  
+}
+
+```
