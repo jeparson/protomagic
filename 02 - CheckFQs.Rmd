@@ -23,10 +23,17 @@ p<-a$project(name = "prototypeercc2")
 
 ```{R, echo=FALSE}
 #identify the app we're going to run [fastqc]
-tsk <- p$task_add(name = "runstuff", 
-           description = "Generate some random number", 
-           app = ,
-           inputs = list(fastqid)))
+appid<-
+  
+  for(fastq in fastqlist){
+  #get the 7bridges file id associated with it    
+ 
+  #run the app on the fastq files 
+tsk <- p$task_add(name = "FastQC Analysis", 
+           description = "Run fastqc to check stuff", 
+           app = appid,
+           inputs = list(FASTQ_Reads=fastqid))
+}
 ```
 
 If we have to do any custom scripting or such, we just add it to docker and push that image:
