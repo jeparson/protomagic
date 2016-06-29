@@ -1,0 +1,18 @@
+---
+title: "05 - Spike-In QC"
+author: "jerod"
+date: "June 29, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+ERCC Dashboard
+* Dashboard Plots
+
+```{R}
+#run the ERCC Dashboard on the appropriate count tables
+
+```
