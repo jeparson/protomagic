@@ -12,9 +12,17 @@ This is streamlined by the utilization of the API from R.
 First we need to know where your files are.  We assume they're present in a directory
 called 'fastq' underneath the working directory
 ```{r}
-fastqdir="fastq/"
+fastqdir<-"fastq/"
 fastqlist<-list.files(path = fastqdir,pattern = ".fastq*")
 ```
+Second we need to collect some metadata.  Fill out the table metadatatable.txt with information
+appropriate to your site:
+
+```{R}
+fastqmetadata<-read.table(file="metadatatable.txt",sep="\t",stringsAsFactors = FALSE,header = TRUE)
+
+```
+
 Then we need to upload them to the cloud for processing.  Auto-Upload is causing an issue.
 ```{r, echo=FALSE}
 ##my api token.  Will need to update before doing any major processing [but should be okay for this 1 HS run]
@@ -22,15 +30,12 @@ require(sevenbridges)
 sevenbridgesapitoken="68916d51f8ba48c1a87a47f135bafef0"
 authurl="https://api.sbgenomics.com/v2/" #i think...
 a<-Auth(sevenbridgesapitoken,url=authurl)
-
+p<-a$project(name = "prototypeercc2")
 
 require("devtools")||install.packages("devtools");require("devtools")
-require("sevenbridges")||install_github("sbg/sevenbridges-r")
+require("sevenbridges")#available on bioconductor
 for(fastq in fastqlist){
-  fastqsize=as.numeric(file.info(paste0(fastqdir,fastq))[1])
-  sevenbridges::upload_init(token=sevenbridgesapitoken,
-                            project_id = "jerod.parsons/prototypeercc2", #this part is causing an issue ; how am i supposed to refer to the project?
-                            name=paste0(fastqdir,fastq),size=fastqsize,part_size=6000000)
+p$upload(filename = )
 }
 #check that the file was successfully uploaded
 ```
