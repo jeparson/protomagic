@@ -1,0 +1,39 @@
+---
+title: "02-CheckFQs"
+author: "jerod"
+date: "June 29, 2016"
+output: html_document
+---
+
+Now we want to do some initial QC on the fastq files we just uploaded
+```{r,echo=FALSE}
+fastqdir="fastq/"
+fastqlist<-list.files(path = fastqdir,pattern = ".fastq*")
+```
+
+
+```{r, echo=FALSE}
+require(sevenbridges)
+sevenbridgesapitoken="68916d51f8ba48c1a87a47f135bafef0"
+authurl="https://api.sbgenomics.com/v2/" #i think...
+a<-Auth(sevenbridgesapitoken,url=authurl)
+p<-a$project(name = "prototypeercc2")
+```
+
+
+```{R, echo=FALSE}
+#identify the app we're going to run [fastqc]
+tsk <- p$task_add(name = "runstuff", 
+           description = "Generate some random number", 
+           app = ,
+           inputs = list(fastqid)))
+```
+
+If we have to do any custom scripting or such, we just add it to docker and push that image:
+http://docs.sevenbridges.com/docs/worked-example-of-uploading-a-custom-python-program
+
+Would like to send all of the result plots to plotly because then we can compare across labs etc.  
+It's open data, right?
+
+Would also like to change the "html document" rendering options to utilize "code folding" because it's awesome.  
+Once there are multiple sections at least.
