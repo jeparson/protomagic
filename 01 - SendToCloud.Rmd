@@ -11,31 +11,42 @@ This is streamlined by the utilization of the API from R.
 #Step 1:  Upload
 First we need to know where your files are.  We assume they're present in a directory
 called 'fastq' underneath the working directory
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(cache = TRUE)#better to not repeat
+```
+
 ```{r}
-fastqdir<-"fastq/"
+#fastqdir<-"fastq/"
+fastqdir<-"/Volumes/Archive2b/RawData/HSMagicMix/fastq/"
 fastqlist<-list.files(path = fastqdir,pattern = ".fastq*")
+erccproject="prototypeercc2"
 ```
 Second we need to collect some metadata.  Fill out the table metadatatable.txt with information
 appropriate to your site:
 
-```{R}
-
+```{r}
+fastqmetadata<-read.table(file="metadatatable.txt",sep="\t",stringsAsFactors = FALSE,header = TRUE)
+head(fastqmetadata)
 ```
 
-Then we need to upload them to the cloud for processing.  Auto-Upload is causing an issue.
+Then we need to upload them to the cloud for processing.  
 ```{r, echo=FALSE}
-fastqmetadata<-read.table(file="metadatatable.txt",sep="\t",stringsAsFactors = FALSE,header = TRUE)
 ##my api token.  Will need to update before doing any major processing [but should be okay for this 1 HS run]
 require(sevenbridges)
 sevenbridgesapitoken="68916d51f8ba48c1a87a47f135bafef0"
-authurl="https://api.sbgenomics.com/v2/" #i think...
+authurl="https://api.sbgenomics.com/v2/"
 a<-Auth(sevenbridgesapitoken,url=authurl)
-p<-a$project(name = "prototypeercc2")
+p<-a$project(name = erccproject)
 
 require("devtools")||install.packages("devtools");require("devtools")
-require("sevenbridges")#available on bioconductor
+require("sevenbridges")#available on bioconductor -- we're hoping to make this all as a pre-setup VM...
 for(fastq in fastqlist){
-p$upload(filename = fastq,metadata=)
-}
-#check that the file was successfully uploaded
+  if(is.null(p$file(name=fastq)))#check to see if it's already in the cloud folder.  Tested, working.  
+    {
+    p$upload(filename = paste0(fastqdir,fastq),metadata=as.list(fastqmetadata[fastqmetadata$Fastq_filename==fastq,2:length(fastqmetadata)]))
+    }
+  }
+#upload actually checks that the file was successfully uploaded
+
 ```

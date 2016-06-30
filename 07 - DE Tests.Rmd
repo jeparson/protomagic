@@ -19,7 +19,7 @@ choosesamples<-function(types){
   #picks out the samples of the chosen types:
   #loads the experimental design document off of cloud [[this doesn't exist yet]]
   experimentaldesignfile="url.to.file"
-    expdesign<-read.table(experimentaldesignfile,sep="\t")
+    expdesign<-read.table(experimentaldesignfile,sep="\t")#maybe needs to be a get call.
   
   
   
