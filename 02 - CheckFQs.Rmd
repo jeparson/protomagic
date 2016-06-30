@@ -4,6 +4,10 @@ author: "jerod"
 date: "June 29, 2016"
 output: html_document
 ---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(cache = TRUE)
+```
 
 Now we want to do some initial QC on the fastq files we just uploaded
 ```{r,echo=FALSE}
@@ -20,21 +24,29 @@ a<-Auth(sevenbridgesapitoken,url=authurl)
 p<-a$project(name = "prototypeercc2")
 ```
 
-
+First we want to run the analysis on all the files.
 ```{R, echo=FALSE}
 #identify the app we're going to run [fastqc]
-appid<-
+appid<-p$app(name="fastqc-analysis")
   
   for(fastq in fastqlist){
   #get the 7bridges file id associated with it    
- 
-  #run the app on the fastq files 
-tsk <- p$task_add(name = "FastQC Analysis", 
-           description = "Run fastqc to check stuff", 
+  fileid<-p$file(name=fastq)[[1]]$id
+  #prepare to run the app on the fastq files 
+tsk <- p$task_add(name = paste0("FastQC Analysis of",fastq), 
+           description = paste0("Run fastqc on",fastq), 
            app = appid,
-           inputs = list(FASTQ_Reads=fastqid))
-}
+           inputs = list(FASTQ_Reads=fileid))
+tsk$run() #actually run it
+  }
 ```
+Then we want to actually look at the results.  The output of fastqc is preconfigured to be
+in HTML, so we just need to have a navbar that points to those files.
+
+```{R}
+
+```
+
 
 If we have to do any custom scripting or such, we just add it to docker and push that image:
 http://docs.sevenbridges.com/docs/worked-example-of-uploading-a-custom-python-program
