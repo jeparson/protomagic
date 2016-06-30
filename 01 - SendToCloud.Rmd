@@ -26,11 +26,11 @@ Second we need to collect some metadata.  Fill out the table metadatatable.txt w
 appropriate to your site:
 
 ```{r}
-fastqmetadata<-read.table(file="metadatatable.txt",sep="\t",stringsAsFactors = FALSE,header = TRUE)
+fastqmetadata<-read.table(file="metadatatable.txt",sep=",",stringsAsFactors = FALSE,header = TRUE)
 head(fastqmetadata)
 ```
 
-Then we need to upload them to the cloud for processing.  
+Then we need to upload them to the cloud for processing.  This will likely go through several iterations of issues.
 ```{r, echo=FALSE}
 ##my api token.  Will need to update before doing any major processing [but should be okay for this 1 HS run]
 require(sevenbridges)
@@ -44,9 +44,23 @@ require("sevenbridges")#available on bioconductor -- we're hoping to make this a
 for(fastq in fastqlist){
   if(is.null(p$file(name=fastq)))#check to see if it's already in the cloud folder.  Tested, working.  
     {
-    p$upload(filename = paste0(fastqdir,fastq),metadata=as.list(fastqmetadata[fastqmetadata$Fastq_filename==fastq,2:length(fastqmetadata)]))
-    }
+#actually check that the file was successfully uploaded
+    #wrap this in tryCatch so that when it has errors [as it invariably will], it doesn't murder the compilation.
+    tryCatch({
+    p$upload(filename = paste0(fastqdir,fastq),metadata=as.list(fastqmetadata[fastqmetadata$Fastq_filename==fastq,2:length(fastqmetadata)])) ##metadata is not registering properly.
+      
+      error=function(err){
+        #check if the file is partial
+        fid=p$file(name=fastq)[[1]]$id
+        localsize=file.info(paste0(fastqdir,fastq))$size
+        remotesize=p$file(id=fid)$size
+        if(remotesize<localsize)
+        #remove the partial file
+        p$delete(id=fid)
+      }
+    })
   }
-#upload actually checks that the file was successfully uploaded
+  }
+
 
 ```

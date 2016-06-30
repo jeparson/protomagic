@@ -5,6 +5,9 @@ We will prototype using NIST in-house data from the 'Magic Mix V1' HiSeq run [as
 The intention is to automate the analysis such that it can be easily reproduced, as we will likely be doing similar or identical work 20+ times in the future.  
 
 #### Step 1:  Upload to the cloud
+  Takes as input a directory full of fastq files from a study & sends to 7BridgesCloud account for ERCC-consortium analysis (Steps 2-10)<p>
+[input makes changes to the RMD;may convert to user-defined input for production?]
+
 #### Step 2:  FastQC
 #### Step 3:  Alignment
 #### Step 4:  BAM QC 
