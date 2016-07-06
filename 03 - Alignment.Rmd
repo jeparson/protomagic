@@ -12,11 +12,40 @@ knitr::opts_chunk$set(cache = TRUE)
 
 
 After looking at our Fastq files, we want to do the actual alignment and quantitation.
+We use STAR for alignment and quantitation.
+
+Because we're using nonstandard spike-ins, we need to make our own reference files.
+```{r}
+#connect to sbg:
+##my api token. [ should be okay for this 1 HS run]
+require(sevenbridges)
+sevenbridgesapitoken="68916d51f8ba48c1a87a47f135bafef0"
+authurl="https://api.sbgenomics.com/v2/"
+a<-Auth(sevenbridgesapitoken,url=authurl)
+p<-a$project(name = erccproject)
+
+#make reference sim.to: (STAR   --runMode genomeGenerate   --runThreadN 8   --genomeDir /Volumes/Archive2b/RawData/HSMagicMix/   --genomeFastaFiles Homo_sapiens.GRCh38.dna.primary_assembly.fa   SIRV_150601a.fasta        --genomeSAsparseD 2)
+genomefastalist<-c(p$file(name="SRM2374_ambiguities_resolved_v1.fasta")$id,p$file(name="SIRV_150601a.fasta")$id,p$file(name="human_g1k_v37_decoy.fasta")$id) 
+
+```
 
 ```{r}
-#
+#carefully defined loop:  We want to select files that are:
+gtf="" #from ucsc + 
+#1: Not already mapped
+#2: from the same library
+#3: appropriately paired."In case of paired-end alignment it is crucial to set metadata 'paired-end' field to 1/2."
 #define the correct input files:  fastq, genomefastalist, GTFfile*
-#run STAR on 7bg cloud 
+  
+  fileid<-p$file(name=fastq)[[1]]$id
+  #prepare to run the app 
+tsk <- p$task_add(name = paste0("STAR_",fastq), 
+           description = paste0("STAR on",fastq), 
+           app = appid,
+           inputs = list(genomefastalist=list(genomeids),sjdbGTFfile=gtfid,fastq=list(fastqpair))
+tsk$run() #actually run it
+  }
+
 #save the appropriate output files: transcriptome_aligned_reads , reads_per_gene
 
 ````

@@ -9,8 +9,9 @@ This analysis automates the map/build/analysis of ERCC2.0 reference datasets.
 Most of the compute is intended to be performed on the cloud via predeveloped 7BG pipelines.
 This is streamlined by the utilization of the API from R.
 #Step 1:  Upload
-First we need to know where your files are.  We assume they're present in a directory
-called 'fastq' underneath the working directory
+First we need to know where your files are.  We assume by default that they're present 
+in a directory called 'fastq' underneath the working directory and that they are named 
+in a way that is unique to your experiment.
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 knitr::opts_chunk$set(cache = TRUE)#better to not repeat
@@ -22,45 +23,53 @@ fastqdir<-"/Volumes/Archive2b/RawData/HSMagicMix/fastq/"
 fastqlist<-list.files(path = fastqdir,pattern = ".fastq*")
 erccproject="prototypeercc2"
 ```
-Second we need to collect some metadata.  Fill out the table metadatatable.txt with information
-appropriate to your site:
+Second we need to collect some metadata.  
+Fill out the table metadatatable.txt with information appropriate to your site:
 
 ```{r}
 fastqmetadata<-read.table(file="metadatatable.txt",sep=",",stringsAsFactors = FALSE,header = TRUE)
 head(fastqmetadata)
 ```
 
-Then we need to upload them to the cloud for processing.  This will likely go through several iterations of issues.
+Then we need to upload them to the cloud for processing.  
 ```{r, echo=FALSE}
-##my api token.  Will need to update before doing any major processing [but should be okay for this 1 HS run]
-require(sevenbridges)
+##my api token. [ should be okay for this 1 HS run]
+require("sevenbridges")#available on bioconductor -- we're hoping to make this all as a pre-setup VM...
 sevenbridgesapitoken="68916d51f8ba48c1a87a47f135bafef0"
 authurl="https://api.sbgenomics.com/v2/"
 a<-Auth(sevenbridgesapitoken,url=authurl)
 p<-a$project(name = erccproject)
 
 require("devtools")||install.packages("devtools");require("devtools")
-require("sevenbridges")#available on bioconductor -- we're hoping to make this all as a pre-setup VM...
-for(fastq in fastqlist){
-  if(is.null(p$file(name=fastq)))#check to see if it's already in the cloud folder.  Tested, working.  
+uploadfunction<-function(fastqlist,fastqdir,fastqmetadata){
+  for(fastq in fastqlist){
+  if(is.null(p$file(name=fastq)))#only upload if it's not already in the cloud folder.  Tested, working.  
     {
-#actually check that the file was successfully uploaded
-    #wrap this in tryCatch so that when it has errors [as it invariably will], it doesn't murder the compilation.
-    tryCatch({
-    p$upload(filename = paste0(fastqdir,fastq),metadata=as.list(fastqmetadata[fastqmetadata$Fastq_filename==fastq,2:length(fastqmetadata)])) ##metadata is not registering properly.
-      
-      error=function(err){
-        #check if the file is partial
-        fid=p$file(name=fastq)[[1]]$id
-        localsize=file.info(paste0(fastqdir,fastq))$size
-        remotesize=p$file(id=fid)$size
-        if(remotesize<localsize)
-        #remove the partial file
-        p$delete(id=fid)
-      }
-    })
+    #actually check that the file was successfully uploaded
+    #wrap this in try so that when it has errors [as it invariably will], it doesn't break everything.
+    try(p$upload(filename = paste0(fastqdir,fastq))) ##metadata is not registering properly
+    if(!is.null(p$file(name=fastq))){
+    if(p$file(id=p$file(name=fastq)$id)$size!=as.numeric(file.info(paste0(fastqdir,fastq))[1])){ #if the local size isn't the remote size, try again.
+        fid=p$file(name=fastq)$id
+        browser()#for testing.  Apparently not covered.
+        p$file(id=fid)$delete #important to make sure that when you make a 'delete' call, it's to the file and not to the project...
+        try(p$upload(filename = paste0(fastqdir,fastq)))
+    }}
+    fid=p$file(name=fastq)$id
+    #p$file(id=fid)$setMeta(as.list(
+     # fastqmetadata[fastqmetadata$Fastq_filename==fastq,2:length(fastqmetadata)])) #whatever is going on with the metadata right now isnt working for 7bc...documentation is sparse
   }
   }
-
-
+}
+#actually call uploadfunction
+#not run yet...
+#uploadfunction(fastqlist,fastqdir,fastqmetadata)
 ```
+Then we need to set the metadata on 7bc
+```{R} 
+lapply(fastqlist,updatemetadata,p=p)
+updatemetadata<-function(x,p){
+fid=p$file(name=x)$id
+metadata<-fastqmetadata[fastqmetadata$Fastq.filename==x,2:length(fastqmetadata)]
+p$file(id=fid)$setMeta(as.list(metadata)) #technically works, but unfortunately the SBC uses "-" as their word separator for 
+}
