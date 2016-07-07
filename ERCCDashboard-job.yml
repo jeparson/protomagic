@@ -1,0 +1,15 @@
+filenameRoot: NIST_HiSeq_Mixes
+isNorm: false
+sample1Name: MixM
+sample2Name: MixL
+erccdilution: 1
+spikeVol: 50
+totalRNAmass: 2500
+choseFDR: 0.05
+source_file:
+  class: File
+  path: runDashboard.R
+exTable:
+  class: File
+  path: NIST_HiSeq_Mixes_Test.csv
+erccmix: RatioPair
