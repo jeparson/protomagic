@@ -11,7 +11,7 @@ processargs<-function(args){
   outlist<-NULL
   go=0;a="datType";b="count"
   stringargs=c("--filenameRoot","--isNorm","--sample1Name","--sample2Name","--exTable","--erccmix")
-  numericargs=c("--erccdilution","--spikeVol","--totalMass","--choseFDR")
+  numericargs=c("--erccdilution","--spikeVol","--totalRNAMass","--choseFDR")
     for (item in args){
   if(item%in%c(stringargs,numericargs)){
     go=2
