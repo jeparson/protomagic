@@ -33,25 +33,25 @@ inputs:
     type: int
     inputBinding:
       position: 5
-      prefix: -dilution
+      prefix: --erccdilution
       separate: false
   - id: spikeVol
     type: int
     inputBinding:
       position: 6
-      prefix: -spikeVol
+      prefix: --spikeVol
       separate: false
   - id: totalRNAmass
     type: int
     inputBinding:
       position: 7
-      prefix: -totalRNAmass
+      prefix: --totalRNAmass
       separate: false
   - id: chose_fdr
     type: numeric
     inputBinding:
       position: 8
-      prefix: -chose_fdr
+      prefix: --chose_fdr
       separate: false
   - id: source_file
     type: ["null", File]
