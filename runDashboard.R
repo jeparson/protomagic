@@ -1,35 +1,22 @@
-args=commandArgs()
-print(args)
+'usage: runDashboard.R [--filenameRoot< --isNorm<boolean>'
 
-##for debugging purposes:
-args<-c("/Library/Frameworks/R.framework/Resources/bin/exec/R","--slave","--no-restore","--file=runDashboard.R","--args","--filenameRoot",
-        "NIST_HiSeq_Mixes_Test.csv","--isNorm","false","--sample1Name","MixM","--sample2Name","MixL","--erccdilution","1",
-        "--spikeVol","50","--totalRNAmass","2500","--choseFDR","0.05","--exTable","NIST_HiSeq_Mixes_Test.csv","--erccmix","RatioPair")
-
+args<-commandArgs(TRUE)
+require(data.table)
 processargs<-function(args){
-  #converts the unnamed --commandline arguments to a named list that can be passed to do.call
+# convert the unnamed --commandline arguments to a named list that can be passed to do.call
   outlist<-NULL
-  go=0;a="datType";b="count"
-  stringargs=c("--filenameRoot","--isNorm","--sample1Name","--sample2Name","--exTable","--erccmix")
-  numericargs=c("--erccdilution","--spikeVol","--totalRNAMass","--choseFDR")
-    for (item in args){
-  if(item%in%c(stringargs,numericargs)){
-    go=2
-    a=c(a,item)
-    next
-  }
-  else{go=go-1}
-    if(go==1){
-      b=c(b,item)
-    }
-  }
-  a<-gsub(pattern = "--",replacement="",x=a)
-  outlist<-setNames(as.list(b),a)
+  stringargs<-c("--filenameRoot","--isNorm","--sample1Name","--sample2Name","--exTable","--erccmix")
+  numericargs<-c("--erccdilution","--spikeVol","--totalRNAmass","--choseFDR")
+  vals<-FALSE
+  theargs<-c("filenameRoot","isNorm","sample1Name","sample2Name","erccdilution","spikeVol","totalRNAmass","choseFDR","source_file","erccmix")
+# This assumes that the arguments go in the order defined in definedashboard.R
+# Any changes to the arguments or order must be doubled in both definedashboard.R and runDashboard.R
+  outlist<-as.list(setNames(args,as.list(theargs)))
   outlist[names(outlist)%in%gsub(x=numericargs,pattern="--",replacement="")]<-as.numeric(outlist[names(outlist)%in%gsub(x=numericargs,pattern="--",replacement="")]) #make things numeric
   return(outlist)
 }
-parameters=processargs(args)
-print(parameters)
+parameters<-processargs(args)
 library(erccdashboard)#rundashboard doesn't work outside of its environment :(
-dbout<-(do.call(erccdashboard::runDashboard,c(list(exTable=read.csv(parameters$exTable)),parameters[names(parameters)!="exTable"])))
-#save(dbout,file=paste0(args[1],".rData"))
+dbout<-(do.call(erccdashboard::runDashboard,c(list(exTable=as.data.frame(data.table::fread(parameters$source_file))),parameters[names(parameters)!="source_file"],datType="Count")))
+# TODO:  Test this with a good count table.
+save(dbout,file=paste0(args[1],".rData"))
