@@ -15,5 +15,25 @@ ERCC Dashboard
 
 ```{R}
 #run the ERCC Dashboard on the appropriate count tables
-
+  appid=p$app(name="runDashboard")$id
+    tsk <- p$task_add(name = paste("Dashboard_Analysis",sampleid,sep="_"), 
+           description = paste("ERCC_Dashboard_Analysis of",sampleid,sep="_"), 
+           app = appid,
+           inputs = list(
+              filenameRoot=NIST_HiSeq_Mixes,
+              isNorm= FALSE,
+              sample1Name: MixM,
+              sample2Name: MixL,
+              erccdilution: 1,
+              spikeVol: 50,
+              totalRNAmass: 2500,
+              choseFDR= 0.05,
+              source_file=p$file(name=mastercounttbl),
+              erccmix="RatioPair"
+           )
+)
+    tsk$run()
+```
+```{r}
+#Display output from dashboard.
 ```
