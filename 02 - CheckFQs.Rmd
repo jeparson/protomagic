@@ -19,33 +19,33 @@ fastqlist<-list.files(path = fastqdir,pattern = ".fastq*")
 ```{r, echo=FALSE}
 require(sevenbridges)
 sevenbridgesapitoken="68916d51f8ba48c1a87a47f135bafef0"
-authurl="https://api.sbgenomics.com/v2/" #i think...
+authurl="https://api.sbgenomics.com/v2/" 
 a<-Auth(sevenbridgesapitoken,url=authurl)
 p<-a$project(name = "prototypeercc2")
 ```
 
 First we want to run the analysis on all the files.
 ```{R, echo=FALSE}
-#identify the app we're going to run [fastqc]
+# identify the app we're going to run [fastqc]
 appid<-p$app(name="fastqc-analysis")
   
   for(fastq in fastqlist){
-  #get the 7bridges file id associated with it    
+  # get the 7bridges file id associated with it    
   fileid<-p$file(name=fastq)[[1]]$id
-  #prepare to run the app on the fastq files 
+  # prepare to run the app on the fastq files 
 tsk <- p$task_add(name = paste0("FastQC Analysis of",fastq), 
            description = paste0("Run fastqc on",fastq), 
            app = appid,
            inputs = list(FASTQ_Reads=fileid))
-tsk$run() #actually run it
+tsk$run() # actually run it
   }
 ```
 Then we want to actually look at the results.  The output of fastqc is preconfigured to be
 in HTML, so we just need to have a navbar that points to those files.
 
 ```{R}
-# Lindsay to figure out how to show the results of the fastqc run...
-
+# TODO Lindsay to figure out how to show the results of the fastqc run...
+# output file for file.fastq is file_fastqc.b64html
 ```
 
 
