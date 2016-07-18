@@ -44,6 +44,7 @@ Then we want to actually look at the results.  The output of fastqc is preconfig
 in HTML, so we just need to have a navbar that points to those files.
 
 ```{R}
+# Lindsay to figure out how to show the results of the fastqc run...
 
 ```
 

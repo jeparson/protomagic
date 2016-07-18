@@ -18,7 +18,7 @@ This is a chance to run some of the read-level QC tools & view their outputs:
 * GC Content plot
 
 ```{r}
-# This will likely take a reasonable amount of energy.  Picard is a cloud app, 
+# TODO Add Dockers/Apps for these analyses. This will likely take a reasonable amount of energy.  Picard is a cloud app, 
 # but ERCC Dashboard and RNASEQC are not.  Dashboard scripts can either be run via dockers
 # or done locally.  RNASEQC has an API available on the broad's "genepattern" cloud.
 

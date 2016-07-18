@@ -8,35 +8,46 @@ output: html_document
 This analysis automates the map/build/analysis of ERCC2.0 reference datasets.
 Most of the compute is intended to be performed on the cloud via predeveloped 7BG pipelines.
 This is streamlined by the utilization of the API from R.
-#Step 1:  Upload
-First we need to know where your files are.  We assume by default that they're present 
-in a directory called 'fastq' underneath the working directory and that they are named 
-in a way that is unique to your experiment.
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 knitr::opts_chunk$set(cache = TRUE)#better to not repeat
 ```
 
+#Step 1:  Define Inputs
+We need 3 input arguments from you.
+
+First we need to know where your files are.  We assume by default that they're 
+present in a directory called 'fastq' underneath the working directory and that
+they are named in a way that is unique to your experiment. Set this to fastqdir.
+
 ```{r}
+# Edit next line to be your fastqdir:
 #fastqdir<-"fastq/"
-fastqdir<-"/Volumes/Archive2b/RawData/HSMagicMix/fastq/"
-fastqlist<-list.files(path = fastqdir,pattern = ".fastq*")
-erccproject="prototypeercc2"
+fastqdir <-"/Volumes/Archive2b/RawData/HSMagicMix/fastq/"
+
+# Get fastq list
+fastqlist <- list.files(path = fastqdir,pattern = ".fastq*")
+erccproject <-"prototypeercc2"
 ```
 Second we need to collect some metadata.  
-Fill out the table metadatatable.txt with information appropriate to your site:
+You should have a file named metadatatable.txt with information appropriate to 
+your site:
 
 ```{r}
-fastqmetadata<-read.table(file="metadatatable.txt",sep=",",stringsAsFactors = FALSE,header = TRUE,colClasses = c(rep("character",10)))
-#apparently everything's supposed to be a string.
+# Import metadatatable.txt
+fastqmetadata <- read.table(file="metadatatable.txt",sep=",",stringsAsFactors = FALSE,header = TRUE,colClasses = c(rep("character",10)))
 head(fastqmetadata)
 ```
-
-Then we need to upload them to the cloud for processing.  
-```{r, echo=FALSE}
-##my api token. [ should be okay for this 1 HS run]
+Third, we need your sevenbridges token.
+```{r}
+# Change this token, currently it's Jerod's api token. [ should be okay for this 1 HS run]
 require("sevenbridges")#available on bioconductor -- we're hoping to make this all as a pre-setup VM...
 sevenbridgesapitoken="68916d51f8ba48c1a87a47f135bafef0"
+```
+
+#Step 2: Upload
+Then we need to upload them to the cloud for processing.  
+```{r, echo=FALSE}
 authurl="https://api.sbgenomics.com/v2/"
 a<-Auth(sevenbridgesapitoken,url=authurl)
 p<-a$project(name = erccproject)
@@ -53,7 +64,6 @@ uploadfile<-function(fastq,project){
     if(!is.null(project$file(name=fastq))){
       if(project$file(id=project$file(name=fastq)$id)$size!=as.numeric(file.info(paste0(fastqdir,fastq))[1])){ #if the local size isn't the remote size, try again.
         fid=project$file(name=fastq)$id
-        browser()#for testing.  Apparently not covered.
         project$file(id=fid)$delete #important to make sure that when you make a 'delete' call, it's to the file and not to the project...
         try(project$upload(filename = paste0(fastqdir,fastq)))
         }
