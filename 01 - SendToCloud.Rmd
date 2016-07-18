@@ -53,12 +53,12 @@ a<-Auth(sevenbridgesapitoken,url=authurl)
 p<-a$project(name = erccproject)
 
 require("devtools")||install.packages("devtools");require("devtools")
-upload2sbc<-function(fastqlist,fastqdir,fastqmetadata,project=p){
+upload2sbc<-function(fastqlist,fastqdir,project=p){
   lapply(fastqlist,uploadfile,project=project)
 uploadfile<-function(fastq,project){
-  if(is.null(project$file(name=fastq)))#only upload if it's not already in the cloud folder.  Tested, working.  
+  if(is.null(project$file(name=fastq)))#only upload if it's not already in the cloud folder.  
     {
-    #actually check that the file was successfully uploaded
+    #check that the file was successfully uploaded
     #wrap this in try so that when it has errors [as it invariably will], it doesn't cancel everything.
     try(project$upload(filename = paste0(fastqdir,fastq)))
     if(!is.null(project$file(name=fastq))){
@@ -70,7 +70,6 @@ uploadfile<-function(fastq,project){
       }
     }
   }
-
 }
 
 #actually call uploadfunction
@@ -79,8 +78,20 @@ uploadfile<-function(fastq,project){
 ```
 Then we need to set the metadata on 7bc
 ```{R} 
+# Define findfile function:   Searches sbc project for a file
+# Avoids awkwardness around the default search only searching top100 files
+findfile<-function(name,p,...){
+  offset<-0
+  while(is.null(p$file(name=name,offset=offset,...))){
+    offset<-offset+100}
+  return(p$file(name=name,offset=offset))
+} # findfile 
+
 lapply(fastqlist,updatemetadata,p=p)
 updatemetadata<-function(x,p){
 metadata<-fastqmetadata[fastqmetadata[,1]==x,2:length(fastqmetadata)]
-p$file(name=x,exact = TRUE)$setMeta(as.list(metadata)) #actually works now that the formatting in metadatatable is correct
+findfile(name=x,p,exact = TRUE)$setMeta(as.list(metadata)) #actually works now that the formatting in metadatatable is correct
 }
+
+
+

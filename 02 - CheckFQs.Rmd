@@ -11,7 +11,7 @@ knitr::opts_chunk$set(cache = TRUE)
 
 Now we want to do some initial QC on the fastq files we just uploaded
 ```{r,echo=FALSE}
-fastqdir="fastq/"
+fastqdir="fastq/" # this needs to be manually edited or stored between files.
 fastqlist<-list.files(path = fastqdir,pattern = ".fastq*")
 ```
 
@@ -27,16 +27,16 @@ p<-a$project(name = "prototypeercc2")
 First we want to run the analysis on all the files.
 ```{R, echo=FALSE}
 # identify the app we're going to run [fastqc]
-appid<-p$app(name="fastqc-analysis")
+appid<-p$app(name="FastQC Analysis")$id
   
   for(fastq in fastqlist){
   # get the 7bridges file id associated with it    
-  fileid<-p$file(name=fastq)[[1]]$id
+  file<-findfile(name=fastq,p)
   # prepare to run the app on the fastq files 
 tsk <- p$task_add(name = paste0("FastQC Analysis of",fastq), 
            description = paste0("Run fastqc on",fastq), 
            app = appid,
-           inputs = list(FASTQ_Reads=fileid))
+           inputs = file)
 tsk$run() # actually run it
   }
 ```
@@ -46,8 +46,22 @@ in HTML, so we just need to have a navbar that points to those files.
 ```{R}
 # TODO Lindsay to figure out how to show the results of the fastqc run...
 # output file for file.fastq is file_fastqc.b64html
+# define a _site.yml & programatically write in the links [see https://rmarkdown.rstudio.com/rmarkdown_websites.html]
+# test if the html files need to be downloaded to the /html folder for building or if they can be remote links
+# also need to decide if / whether the output needs to be separate from the scripting of the runs.
+# To download directly from R, use download call directly from single File object.
+findfile(name = "x",p)$download("~/Downloads/")
 ```
-
+```{R}
+# Define findfile function:   Searches sbc project for a file
+# Avoids awkwardness around the default search only searching top100 files
+findfile<-function(name,p){
+  offset<-0
+  while(is.null(p$file(name=name,offset=offset))){
+    offset<-offset+100}
+  return(p$file(name=name,offset=offset))
+}
+```
 
 If we have to do any custom scripting or such, we just add it to docker and push that image:
 http://docs.sevenbridges.com/docs/worked-example-of-uploading-a-custom-python-program
