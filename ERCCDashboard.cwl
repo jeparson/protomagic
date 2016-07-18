@@ -3,7 +3,7 @@ class: CommandLineTool
 baseCommand: RScript
 hints:
   - class: DockerRequirement
-    dockerPull: bioconductor/release_microarray
+    dockerPull: bioconductor/devel_sequencing
 inputs:
   - id: filenameRoot
     type: string
