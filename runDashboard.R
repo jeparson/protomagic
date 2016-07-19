@@ -2,6 +2,8 @@
 
 args<-commandArgs(TRUE)
 require(data.table)
+source("https://bioconductor.org/biocLite.R")
+biocLite("erccdashboard")
 processargs<-function(args){
 # convert the unnamed --commandline arguments to a named list that can be passed to do.call
   outlist<-NULL

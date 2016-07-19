@@ -15,8 +15,8 @@ inputs = list(
     position= 1),
   input(
     id='isNorm',
-    type='boolean',
-    default=TRUE,
+    type='string',
+    default="TRUE",
     required=TRUE,
     position=2),
   input(
