@@ -13,18 +13,23 @@ knitr::opts_chunk$set(cache = TRUE)
 ```{r, echo=FALSE}
 require(sevenbridges)
 sevenbridgesapitoken="68916d51f8ba48c1a87a47f135bafef0"
-authurl="https://api.sbgenomics.com/v2/" #i think...
+authurl="https://api.sbgenomics.com/v2/"
 a<-Auth(sevenbridgesapitoken,url=authurl)
 p<-a$project(name = "prototypeercc2")
 ```
 
 ```{r}
-#merge all of the individual run counts into a single master count table
-#list output files from Alignment
-## list all outputs file from a task id
-a$task(id = alignmenttask)$file()
-#get those files
+# merge all of the individual run counts into a single master count table
+sampleglist<-p$file(name="genes.results") # this is specific to the STAR/RSEM output
+sampletlist<-p$file(name="isoforms.results") 
+# select all individual run counts
+# this app is defined by dmergecounts.R and runs mergecounts.R
 
+# list output files from Alignment
+
+# list all outputs file from a task id
+a$task(id = alignmenttask)$file()
+# get those files
 #
 
 
