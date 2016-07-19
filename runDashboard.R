@@ -1,4 +1,4 @@
-'usage: runDashboard.R [--filenameRoot< --isNorm<boolean>'
+'usage: runDashboard.R [--filenameRoot< isNorm<boolean> sample1Name<string> sample2Name<string> erccdilution<numeric> spikeVol<numeric> totalRNAmass<numeric> choseFDR<numeric> source_file<file path> erccmix<string>'
 
 args<-commandArgs(TRUE)
 require(data.table)
@@ -17,6 +17,9 @@ processargs<-function(args){
 }
 parameters<-processargs(args)
 library(erccdashboard)#rundashboard doesn't work outside of its environment :(
-dbout<-(do.call(erccdashboard::runDashboard,c(list(exTable=as.data.frame(data.table::fread(parameters$source_file))),parameters[names(parameters)!="source_file"],datType="Count")))
+ttable<-as.data.frame(data.table::fread(parameters$source_file))
+dbout<-runDashboard(datType = "count",isNorm = parameters$isNorm,exTable = ttable,filenameRoot = parameters$filenameRoot,sample1Name = parameters$sample1Name,sample2Name = parameters$sample2Name,
+                    erccmix = parameters$erccmix,erccdilution = parameters$erccdilution,totalRNAmass = parameters$totalRNAmass,spikeVol = parameters$spikeVol,choseFDR = parameters$choseFDR)
+#dbout<-(do.call(runDashboard,list(exTable="ttable",parameters[names(parameters)!="source_file"],datType="Count")))) #for whatever reason i couldn't get do.call to do what i wanted.
 # TODO:  Test this with a good count table.
 save(dbout,file=paste0(args[1],".rData"))
