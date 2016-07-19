@@ -6,7 +6,7 @@ fl=fileDef(name='runDashboard.R',content=read_file('runDashboard.R'))
 ERCCDashboard<-Tool(id="ERCCdashboard",label="ERCCdashboard",
 hints = requirements(docker(pull="bioconductor/devel_sequencing"),cpu(1),mem(2000)),
 requirements=requirements(fl),
-baseCommand = "RScript runDashboard.R",
+baseCommand = "Rscript runDashboard.R",
 inputs = list(
   input(
     id='filenameRoot',
@@ -49,7 +49,7 @@ inputs = list(
   position=7),
   input(
     id='chose_fdr',
-    type='int',
+    type='float',
     required=TRUE,
     default=0.05,
     position= 8),
