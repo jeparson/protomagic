@@ -12,7 +12,9 @@ knitr::opts_chunk$set(cache = TRUE)
 Now we want to do some initial QC on the fastq files we just uploaded
 ```{r,echo=FALSE}
 fastqdir="fastq/" # this needs to be manually edited or stored between files.
-fastqlist<-list.files(path = fastqdir,pattern = ".fastq*")
+#alternately, just search the project based on the metadata...
+sbfastqlist<-lapply(fastqmetadata$Fastq.filename,FUN = function(x){findfile(name=x,p=p)})
+
 ```
 
 
@@ -29,14 +31,12 @@ First we want to run the analysis on all the files.
 # identify the app we're going to run [fastqc]
 appid<-p$app(name="FastQC Analysis")$id
   
-  for(fastq in fastqlist){
-  # get the 7bridges file id associated with it    
-  file<-findfile(name=fastq,p)
+  for(cfastq in sbfastqlist){
   # prepare to run the app on the fastq files 
-tsk <- p$task_add(name = paste0("FastQC Analysis of",fastq), 
-           description = paste0("Run fastqc on",fastq), 
+tsk <- p$task_add(name = paste0("FastQC_",cfastq$name), 
+           description = paste0("Run fastqc on ",cfastq$name), 
            app = appid,
-           inputs = file)
+           FASTQ_Reads = cfastq)
 tsk$run() # actually run it
   }
 ```
