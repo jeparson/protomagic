@@ -82,9 +82,15 @@ Then we need to set the metadata on 7bc
 # Avoids awkwardness around the default search only searching top100 files
 findfile<-function(name,p,...){
   offset<-0
-  while(is.null(p$file(name=name,offset=offset,...))){
+  while(length(p$file(offset=offset))==100){
+    offset<-offset+100
+  }# Count the total number of files
+  maxoffset<-offset
+  offset<-0
+  while(offset <= maxoffset){
+    if(!is.null(p$file(name=name,offset=offset))){return(p$file(name=name,offset=offset))}
     offset<-offset+100}
-  return(p$file(name=name,offset=offset))
+return(NULL)
 } # findfile 
 
 lapply(fastqlist,updatemetadata,p=p)

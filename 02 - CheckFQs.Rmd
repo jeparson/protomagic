@@ -34,9 +34,9 @@ appid<-p$app(name="FastQC Analysis")$id
   for(cfastq in sbfastqlist){
   # prepare to run the app on the fastq files 
 tsk <- p$task_add(name = paste0("FastQC_",cfastq$name), 
-           description = paste0("Run fastqc on ",cfastq$name), 
+           description = paste0("FastQC of ",cfastq$name), 
            app = appid,
-           FASTQ_Reads = cfastq)
+           inputs=list(FASTQ_Reads = cfastq))
 tsk$run() # actually run it
   }
 ```
