@@ -38,7 +38,8 @@ your site:
 fastqmetadata <- read.table(file="metadatatable.txt",sep=",",stringsAsFactors = FALSE,header = TRUE,colClasses = c(rep("character",10)))
 head(fastqmetadata)
 ```
-Third, we need your sevenbridges token.
+Third, we need your sevenbridges token.  At this point, it's probably a good plan to tell you to change your email settings on sevenbridges:
+You're going to get a *lot* of emails for successful runs if not.
 ```{r}
 # Change this token, currently it's Jerod's api token. [ should be okay for this 1 HS run]
 require("sevenbridges")#available on bioconductor -- we're hoping to make this all as a pre-setup VM...
