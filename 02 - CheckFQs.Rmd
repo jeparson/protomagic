@@ -11,10 +11,9 @@ knitr::opts_chunk$set(cache = TRUE)
 
 Now we want to do some initial QC on the fastq files we just uploaded
 ```{r,echo=FALSE}
-fastqdir="fastq/" # this needs to be manually edited or stored between files.
 #alternately, just search the project based on the metadata...
+fastqmetadata<-read.csv("metadatatable.txt")
 sbfastqlist<-lapply(fastqmetadata$Fastq.filename,FUN = function(x){findfile(name=x,p=p)})
-
 ```
 ```{r, echo=FALSE}
 require(sevenbridges)
