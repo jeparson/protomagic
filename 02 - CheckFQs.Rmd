@@ -33,12 +33,20 @@ appid<-p$app(name="FastQC Analysis")$id
   
   for(cfastq in sbfastqlist){
   # prepare to run the app on the fastq files 
+  # check to see if the result file exists already
+  if(is.null(findfile(fqcresult(cfastq$name)))){  
 tsk <- p$task_add(name = paste0("FastQC_",cfastq$name), 
            description = paste0("FastQC of ",cfastq$name), 
            app = appid,
            inputs=list(FASTQ_Reads = cfastq))
 tsk$run() # actually run it
   }
+  }
+fqcresult<-function(filename){
+  # output filename of fastqc on a fastq input.  just a string modification
+  return(gsub(x=filename,pattern = ".fastq[\\S]+",replacement="_fastqc.b64html",perl=TRUE))
+
+}
 ```
 Then we want to actually look at the results.  The output of fastqc is preconfigured to be
 in HTML, so we just need to have a navbar that points to those files.
@@ -50,17 +58,23 @@ in HTML, so we just need to have a navbar that points to those files.
 # test if the html files need to be downloaded to the /html folder for building or if they can be remote links
 # also need to decide if / whether the output needs to be separate from the scripting of the runs.
 # To download directly from R, use download call directly from single File object.
-findfile(name = "x",p)$download("~/Downloads/")
+#findfile(name = "x",p)$download("~/Downloads/")
 ```
 ```{R}
 # Define findfile function:   Searches sbc project for a file
 # Avoids awkwardness around the default search only searching top100 files
-findfile<-function(name,p){
+findfile<-function(name,p,...){
   offset<-0
-  while(is.null(p$file(name=name,offset=offset))){
+  while(length(p$file(offset=offset))==100){
+    offset<-offset+100
+  }# Count the total number of files
+  maxoffset<-offset
+  offset<-0
+  while(offset <= maxoffset){
+    if(!is.null(p$file(name=name,offset=offset))){return(p$file(name=name,offset=offset))}
     offset<-offset+100}
-  return(p$file(name=name,offset=offset))
-}
+return(NULL)
+} # findfile 
 ```
 
 If we have to do any custom scripting or such, we just add it to docker and push that image:
