@@ -19,6 +19,7 @@ Because we're using nonstandard spike-ins, we need to make our own reference fil
 ```{r}
 #connect to sbg:
 ##my api token. [ should be okay for this 1 HS run]
+erccproject="prototypeercc2"
 require(sevenbridges)
 sevenbridgesapitoken="68916d51f8ba48c1a87a47f135bafef0"
 authurl="https://api.sbgenomics.com/v2/"
@@ -26,8 +27,9 @@ a<-Auth(sevenbridgesapitoken,url=authurl)
 p<-a$project(name = erccproject)
 
 #aid=p$app(name="SBG FASTQ Merge")
-#genomefastalist<-c(p$file(name="SRM2374_ambiguities_resolved_v1.fasta")$id,p$file(name="SIRV_150601a.fasta")$id,p$file(name="human_g1k_v37_decoy.fasta")$id) 
-#tsk<-p$task_add(name="Generate Fasta",description="haha",app=aid,inputs=genomefastalist)
+#genomefastalist<-c(findfile(name="SRM2374_ambiguities_resolved_v1.fasta",p),findfile(name="SIRV_150601a.fasta",p),findfile(name="human_g1k_v37_decoy.fasta",p)) 
+#tsk<-p$task_add(name="Generate Fasta",description="ERCC2-Reference-Fasta(SIRV-ERCC-gencodev37)",app=aid,inputs=list(genomefastalist))
+#tsk$run()
 #not run - already exists on server.
 ```
 
@@ -61,8 +63,9 @@ for(fastq in sbfastqlist){
   switch(fastq$meta()$paired_end,
 "1" = {fastq1<-fastq;next},
 "2" = {fastq2<-fastq})
-# check to see if the output exists.
-
+# TODO check to see if the output exists.
+# check to make sure that fastq1 and fastq2 are actually the same sample
+  if(fastq1$meta()$batch_number!=fastq2$meta()$batch_number){stop("fastq1 and fastq2 are not the same sample: please sort your fastqmetadata file by sample!")}
 # prepare to run the app 
   
     sampleid=fastq1$metadata$batch_number
