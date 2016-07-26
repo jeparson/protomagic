@@ -16,8 +16,8 @@ ERCC Dashboard
 ```{R}
 # run the ERCC Dashboard on the appropriate count tables
 # this cloud app is defined by definedashboard.R and runs runDashboard.R.
-  appid=p$app(name="runDashboard")$id
-    tsk <- p$task_add(name = paste("Dashboard_Analysis",sampleid,sep="_"), 
+  appid=p$app(name="runDashboardBeta")$id
+    tsk <- p$task_add(name = paste("Beta_Dashboard_Analysis",sampleid,sep="_"), 
            description = paste("ERCC_Dashboard_Analysis of",sampleid,sep="_"), 
            app = appid,
            inputs = list(
