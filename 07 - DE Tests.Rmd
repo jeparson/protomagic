@@ -14,12 +14,12 @@ Now to calculate differential expression.
 
 We need to subselect various replicates of each type of sample.
 ```{r,echo=TRUE}
-#Some code to select samples simply
+# Some code to select samples simply
 choosesamples<-function(types){
-  #picks out the samples of the chosen types:
-  #loads the experimental design document off of cloud [[this doesn't exist yet]]
-  experimentaldesignfile="url.to.file"
-    expdesign<-read.table(experimentaldesignfile,sep="\t")#maybe needs to be a get call.
+  # picks out the samples of the chosen types:
+  # loads the experimental design document off of gh
+  experimentaldesignfile="github.com/jeparson/protomagic/SampleDesign.csv"
+    expdesign<-read.table(experimentaldesignfile,sep="\t",header=TRUE)
   
   
   
