@@ -20,7 +20,7 @@ require(sevenbridges)
 sevenbridgesapitoken="68916d51f8ba48c1a87a47f135bafef0"
 authurl="https://api.sbgenomics.com/v2/" 
 a<-Auth(sevenbridgesapitoken,url=authurl)
-p<-a$project(name = "prototypeercc2")
+p<-a$project(name = "prototypeercc2",exact = TRUE)
 ```
 ```{R, echo=FALSE}
 # identify the app we're going to run [fastqc]
