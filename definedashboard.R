@@ -2,11 +2,11 @@ library(sevenbridges)
 library(readr)
 #reads local file, but defines it on the job / image
 # Any changes to the inputs or positions must be doubled in both definedashboard.R and runDashboard.R
-fl=fileDef(name='runDashboard.R',content=read_file('runDashboard.R'))
+fl=fileDef(name='runDashboardBeta.R',content=read_file('runDashboardBeta.R'))
 ERCCDashboard<-Tool(id="ERCCdashboard",label="ERCCdashboard",
 hints = requirements(docker(pull="bioconductor/devel_sequencing"),cpu(1),mem(2000)),
 requirements=requirements(fl),
-baseCommand = "Rscript runDashboard.R",
+baseCommand = "Rscript runDashboardBeta.R",
 inputs = IPList(
   input(
     id='filenameRoot',
@@ -88,4 +88,4 @@ inputs = IPList(
 outputs=list(output(type = ItemArray("File"),id = 'DashboardFigures',glob = "*.pdf"),output(id='data',glob="*.rData",type="file"))
 )
 
-p$app_add('runDashboard',ERCCDashboard)
+p$app_add('runDashboardBeta',ERCCDashboard)
