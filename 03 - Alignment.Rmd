@@ -39,7 +39,18 @@ tsk$run()
 
 ```{r}
 #define the correct input files:  fastq, genomefastalist, GTFfile*
-
+findfile<-function(name,p,...){
+  offset<-0
+  while(length(p$file(offset=offset))==100){
+    offset<-offset+100
+  }# Count the total number of files
+  maxoffset<-offset
+  offset<-0
+  while(offset <= maxoffset){
+    if(!is.null(p$file(name=name,offset=offset))){return(p$file(name=name,offset=offset))}
+    offset<-offset+100}
+return(NULL)
+} # findfile 
 gtflist <- FileList(findfile(name="ERCC.gtf",p),findfile(name="SIRV_O_150601a.gtf",p),findfile(name="Homo_sapiens.GRCh38.84.gtf",p))
 gtfcombine <- p$task_add(app=p$app(name="GTF combiner")$id,inputs=list(Infiles=FilesList(findfile(name="ERCC.gtf",p),findfile(name="SIRV_O_150601a.gtf",p),findfile(name="Homo_sapiens.GRCh38.84.gtf",p))))
 gtfcombine$run()
