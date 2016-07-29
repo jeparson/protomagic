@@ -101,7 +101,7 @@ for(fastq in sbfastqlist){
 }
 # TESTING 
 print(tsklist)
-
+# TODO apply metadata to output bam files
 # TODO identify the appropriate output files for the next steps: transcriptome_aligned_reads, reads_per_gene, bam
 # TODO generate app and task to merge all reads_per_isoform files to make the master count table [05 - count table.rmd]
 # TODO 
