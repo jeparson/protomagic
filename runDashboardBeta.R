@@ -6,7 +6,7 @@ pkgneeded<-cranpackagelist[!cranpackagelist%in%installed.packages()]
 if(length(pkgneeded)){install.packages(pkgneeded)}
 require(data.table)
 require(devtools)
-devtools::install_github(repo = "usnistgov/erccdashboard")
+devtools::install_github(repo = "usnistgov/erccdashboard@isoform")
 processargs<-function(args){
 # convert the unnamed --commandline arguments to a named list that can be passed to do.call
   outlist<-NULL
