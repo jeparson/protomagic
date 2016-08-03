@@ -79,26 +79,6 @@ uploadfile<-function(fastq,project){
 ```
 Then we need to set the metadata on 7bc
 ```{R} 
-# Define findfile function:   Searches sbc project for a file
-# Avoids awkwardness around the default search only searching top100 files
-findfile<-function(name,p,...){
-  offset<-0
-  while(length(p$file(offset=offset))==100){
-    offset<-offset+100
-  }# Count the total number of files
-  maxoffset<-offset
-  offset<-0
-  while(offset <= maxoffset){
-    if(!is.null(p$file(name=name,offset=offset))){return(p$file(name=name,offset=offset))}
-    offset<-offset+100}
-return(NULL)
-} # findfile 
-
+source("ConvenienceFunctions.R") # Functions that help the R interface with SBC go more smoothly and are applied in multiple contexts.
 lapply(fastqlist,updatemetadata,p=p)
-updatemetadata<-function(x,p){
-metadata<-fastqmetadata[fastqmetadata[,1]==x,2:length(fastqmetadata)]
-findfile(name=x,p,exact = TRUE)$setMeta(as.list(metadata)) #actually works now that the formatting in metadatatable is correct
-}
-
-
-
+```
