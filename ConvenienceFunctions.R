@@ -1,3 +1,7 @@
+#TODO : Should this script also load the metadata from the local host since it's frequently used?
+#TODO : Should this script set the project and authorization since they're used everywhere?
+#TODO : Add Site to metadata in an appropriate location[SampleID/Investigation/Batch_number]
+
 updatemetadata<-function(x,p,fastqmetadata=fastqmetadata){
   metadata<-fastqmetadata[fastqmetadata[,1]==x,2:length(fastqmetadata)]
   findfile(name=x,p,exact = TRUE)$setMeta(as.list(metadata)) # actually works now that the formatting in metadatatable is correct
