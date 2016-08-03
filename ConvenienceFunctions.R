@@ -5,7 +5,14 @@
 updatemetadata<-function(x,p,fastqmetadata=fastqmetadata){
   metadata<-fastqmetadata[fastqmetadata[,1]==x,2:length(fastqmetadata)]
   findfile(name=x,p,exact = TRUE)$setMeta(as.list(metadata)) # actually works now that the formatting in metadatatable is correct
-} # Sets the metadata of a file on sbc to that presented in the metadatatable file.
+} # Sets the metadata of a file on sbc to that presented in the metadatatable file [based on filename, only for fastqs].
+
+
+gupdatemetadata<-function(src,dest,p,fastqmetadata=fastqmetadata){
+  metadata<-fastqmetadata[fastqmetadata[,1]==src,2:length(fastqmetadata)]
+  findfile(name=dest,p,exact = TRUE)$setMeta(as.list(metadata)) # actually works now that the formatting in metadatatable is correct
+} # Sets the metadata of a file on sbc to that presented in the metadatatable file [based on filename, only for fastqs].
+
 
 # Define findfile function:   Searches sbc project for a file
 # Avoids awkwardness around the default search only searching top100 files
@@ -17,7 +24,7 @@ findfile<-function(name,p,...){
   maxoffset<-offset
   offset<-0
   while(offset <= maxoffset){
-    if(!is.null(p$file(name=name,offset=offset))){return(p$file(name=name,offset=offset))}
+    if(!is.null(p$file(name=name,offset=offset,...))){return(p$file(name=name,offset=offset,...))}
     offset<-offset+100}
   return(NULL)
 } # findfile
@@ -35,6 +42,8 @@ copymetadata<-function(tskid,p){
   filelist<-p$task(id=tsklist[I])$file() # only the output files
   source<-p$task(id=tsklist[I])$inputs$input_archive_file$name # the relevant input file
   fastqmetadata <- read.table(file="metadatatable.txt",sep=",",stringsAsFactors = FALSE,header = TRUE,colClasses = c(rep("character",10)))
-  lapply(filelist,updatemetadata,p,fastqmetadata)
+  lapply(filelist,gupdatemetadata,p,fastqmetadata)
 
-}
+} # function that exists to push metadata across an entire set of output.
+# TODO: Test copymetadata.
+# TODO: Determine if/when metadata [eg: paired_end and platform_unit_id] shouldn't be applied to downstream files
