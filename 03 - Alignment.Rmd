@@ -39,18 +39,8 @@ tsk$run()
 
 ```{r}
 #define the correct input files:  fastq, genomefastalist, GTFfile*
-findfile<-function(name,p,...){
-  offset<-0
-  while(length(p$file(offset=offset))==100){
-    offset<-offset+100
-  }# Count the total number of files
-  maxoffset<-offset
-  offset<-0
-  while(offset <= maxoffset){
-    if(!is.null(p$file(name=name,offset=offset))){return(p$file(name=name,offset=offset))}
-    offset<-offset+100}
-return(NULL)
-} # findfile 
+source("ConvenienceFunctions.R")
+
 #gtflist <- FileList(findfile(name="ERCC.gtf",p),findfile(name="SIRV_O_150601a.gtf",p),findfile(name="Homo_sapiens.GRCh38.84.gtf",p))
 gtfcombine <- p$task_add(app=p$app(name="GTF combiner")$id,inputs=list(Infiles=FilesList(findfile(name="ERCC.gtf",p),findfile(name="SIRV_O_150601a.gtf",p),findfile(name="Homo_sapiens.GRCh38.84.gtf",p))))
 gtfcombine$run()
@@ -97,32 +87,18 @@ for(fastq in sbfastqlist){
            inputs = list(sample_name=sampleid,prepare_reference_output_files=referencelist,input_archive_file=fastq1,input_archive_file_1=fastq2)
            )
     tsklist<-c(tsklist,tsk$id) # save a list of the tasks that're associated with this phase, to ease the process of collecting the output files somewhat.
-  
-#    tsk$run() # runs the alignment/quant.
+    tsk$run() # runs the alignment/quant.
 }
 # TESTING 
 if(length(tsklist)!=length(sbfastqlist/2)){stop("uh...some problems here")}
 # check status of the task before looking for its output files
 # Look over all the tsklist and make sure that they're completed, wait for them if not, and throw errors otherwise
   lapply(tsklist,statuscheck,p)
-  statuscheck<-function(x,p){
-    tsk=p$task(id=x)
-    switch(tsk$status,
-          "RUNNING" = {tsk$monitor(time=120);return(paste0(tsk$name,"Waited until COMPLETED"))},
-          "COMPLETED" = return(paste0(tsk$name,"COMPLETED")),
-          "DRAFT" = {warning("Task in list is in draft status: not run");return(paste0(tsk$name,"ERROR"))})
-    return(paste0(tsk$name,"UNKNOWN_STATUS"))}
-# TODO test to see if this is a good way to handle running tasks.  Seems okay with stalled tasks.
 
 # Set metadata of output files.
-filelist<-p$task(id=tsklist[I])$file() # only the output files
-source<-p$task(id=tsklist[I])$inputs$input_archive_file$name # the relevant input file
-copymetadata(filelist,source,p) # there's something odd here about the many:one relationship that will probably require some finagling.
+lapply(tsklist,copymetadata,p) # this is what i'd like to do, so i just need to make copymetadata work how i want it to
+# there's something odd here about the many:one relationship that will probably require some finagling.  Mapply?
 
-copymetadata<-function(x,y,p){
-metadata<-fastqmetadata[fastqmetadata[,1]==x,2:length(fastqmetadata)]
-findfile(name=y,p,exact = TRUE)$setMeta(as.list(metadata)) #actually works now that the formatting in metadatatable is correct
-}
 print(tsklist)
 # TODO apply metadata to output bam files
 # TODO identify the appropriate output files for the next steps: transcriptome_aligned_reads, reads_per_gene, bam
