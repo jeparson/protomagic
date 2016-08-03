@@ -22,7 +22,7 @@ they are named in a way that is unique to your experiment. Set this to fastqdir.
 
 ```{r}
 # Edit next line to be your fastqdir:
-#fastqdir<-"fastq/"
+# fastqdir<-"fastq/"
 fastqdir <-"/Volumes/Archive2b/RawData/HSMagicMix/fastq/"
 
 # Get fastq list
@@ -35,14 +35,16 @@ your site:
 
 ```{r}
 # Import metadatatable.txt
+source("ConvenienceFunctions.R") # Functions that help the R interface with SBC go more smoothly and are applied in multiple contexts.
 fastqmetadata <- read.table(file="metadatatable.txt",sep=",",stringsAsFactors = FALSE,header = TRUE,colClasses = c(rep("character",10)))
 head(fastqmetadata)
 ```
 Third, we need your sevenbridges token.  At this point, it's probably a good plan to tell you to change your email settings on sevenbridges:
 You're going to get a *lot* of emails for successful runs if not.
 ```{r}
-# Change this token, currently it's Jerod's api token. [ should be okay for this 1 HS run]
+require("devtools")||install.packages("devtools");require("devtools")
 require("sevenbridges")#available on bioconductor -- we're hoping to make this all as a pre-setup VM...
+# Change this token, currently it's useless.
 sevenbridgesapitoken="68916d51f8ba48c1a87a47f135bafef0"
 ```
 
@@ -53,19 +55,18 @@ authurl="https://api.sbgenomics.com/v2/"
 a<-Auth(sevenbridgesapitoken,url=authurl)
 p<-a$project(name = erccproject)
 
-require("devtools")||install.packages("devtools");require("devtools")
 upload2sbc<-function(fastqlist,fastqdir,project=p){
   lapply(fastqlist,uploadfile,project=project)
 uploadfile<-function(fastq,project){
   if(is.null(project$file(name=fastq)))#only upload if it's not already in the cloud folder.  
     {
-    #check that the file was successfully uploaded
-    #wrap this in try so that when it has errors [as it invariably will], it doesn't cancel everything.
+    # Check that the file was successfully uploaded
+    # Wrap this in try so that when it has errors [as it invariably will], it doesn't cancel everything.
     try(project$upload(filename = paste0(fastqdir,fastq)))
     if(!is.null(project$file(name=fastq))){
-      if(project$file(id=project$file(name=fastq)$id)$size!=as.numeric(file.info(paste0(fastqdir,fastq))[1])){ #if the local size isn't the remote size, try again.
+      if(project$file(id=project$file(name=fastq)$id)$size!=as.numeric(file.info(paste0(fastqdir,fastq))[1])){ # If the local size isn't the remote size, try again.
         fid=project$file(name=fastq)$id
-        project$file(id=fid)$delete #important to make sure that when you make a 'delete' call, it's to the file and not to the project...
+        project$file(id=fid)$delete # Important to make sure that when you make a 'delete' call, it's to the file and not to the project...
         try(project$upload(filename = paste0(fastqdir,fastq)))
         }
       }
@@ -73,12 +74,11 @@ uploadfile<-function(fastq,project){
   }
 }
 
-#actually call uploadfunction
-#not run yet...
-#uploadfunction(fastqlist,fastqdir,fastqmetadata,p)
+# Actually call uploadfunction
+# Not run yet...
+# uploadfunction(fastqlist,fastqdir,fastqmetadata,p)
 ```
 Then we need to set the metadata on 7bc
 ```{R} 
-source("ConvenienceFunctions.R") # Functions that help the R interface with SBC go more smoothly and are applied in multiple contexts.
 lapply(fastqlist,updatemetadata,p=p)
 ```
