@@ -9,8 +9,11 @@ updatemetadata<-function(x,p,fastqmetadata=fastqmetadata){
 
 
 gupdatemetadata<-function(src,dest,p,fastqmetadata=fastqmetadata){
-  metadata<-fastqmetadata[fastqmetadata[,1]==src,2:length(fastqmetadata)]
-  findfile(name=dest,p,exact = TRUE)$setMeta(as.list(metadata)) # actually works now that the formatting in metadatatable is correct
+# Inputs:  Src and Dest are file objects, p is a project object, and fastqmetadata is a table.
+# Src must be contained within the fastqmetadata table, meaning, it'd better be a fastq file.
+  metadata<-fastqmetadata[fastqmetadata[,1]==src$name,2:length(fastqmetadata)]
+  if(length(metadata[,1])){
+  dest$setMeta(as.list(metadata))} # Let's only set it if it's a real thing...
 } # Sets the metadata of a file on sbc to that presented in the metadatatable file [based on filename, only for fastqs].
 
 
@@ -39,11 +42,10 @@ statuscheck<-function(x,p){
 # TODO test to see if this is a good way to handle running tasks.  Seems okay with stalled tasks.
 
 copymetadata<-function(tskid,p){
-  filelist<-p$task(id=tsklist[I])$file() # only the output files
-  source<-p$task(id=tsklist[I])$inputs$input_archive_file$name # the relevant input file
+  filelist<-p$task(id=tskid)$file() # only the output files
+  source<-findfile(p$task(id=tskid)$inputs$input_archive_file$name,p) # the relevant input file if we're dealing with alignments, but not in general...
   fastqmetadata <- read.table(file="metadatatable.txt",sep=",",stringsAsFactors = FALSE,header = TRUE,colClasses = c(rep("character",10)))
-  lapply(filelist,gupdatemetadata,p,fastqmetadata)
+  lapply(filelist,gupdatemetadata,p=p,fastqmetadata=fastqmetadata,src=source)
 
 } # function that exists to push metadata across an entire set of output.
-# TODO: Test copymetadata.
 # TODO: Determine if/when metadata [eg: paired_end and platform_unit_id] shouldn't be applied to downstream files
