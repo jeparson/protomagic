@@ -93,13 +93,13 @@ for(fastq in sbfastqlist){
 if(length(tsklist)!=length(sbfastqlist/2)){stop("uh...some problems here")}
 # check status of the task before looking for its output files
 # Look over all the tsklist and make sure that they're completed, wait for them if not, and throw errors otherwise
-  lapply(tsklist,statuscheck,p)
+lapply(tsklist,statuscheck,p)
 
 # Set metadata of output files.
-lapply(tsklist,copymetadata,p) # this is what i'd like to do, so i just need to make copymetadata work how i want it to
-# there's something odd here about the many:one relationship that will probably require some finagling.  Mapply?
+srclist<-lapply(tsklist,FUN = function(x,p){findfile(p$task(id=x)$inputs$input_archive_file$name,p)},p)
+mapply(FUN = copymetadata,tsklist,srclist,MoreArgs=list(p)) # this is what i'd like to do, so i just need to make copymetadata work how i want it to
 
-print(tsklist)
+# DEBUG print(tsklist)
 # TODO apply metadata to output bam files
 # TODO identify the appropriate output files for the next steps: transcriptome_aligned_reads, reads_per_gene, bam
 # TODO generate app and task to merge all reads_per_isoform files to make the master count table [05 - count table.rmd]

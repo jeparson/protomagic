@@ -8,18 +8,19 @@ updatemetadata<-function(x,p,fastqmetadata=fastqmetadata){
 } # Sets the metadata of a file on sbc to that presented in the metadatatable file [based on filename, only for fastqs].
 
 
-gupdatemetadata<-function(src,dest,p,fastqmetadata=fastqmetadata){
-# Inputs:  Src and Dest are file objects, p is a project object, and fastqmetadata is a table.
-# Src must be contained within the fastqmetadata table, meaning, it'd better be a fastq file.
-  metadata<-fastqmetadata[fastqmetadata[,1]==src$name,2:length(fastqmetadata)]
-  if(length(metadata[,1])){
+gupdatemetadata<-function(dest,metadata){
+# Inputs:  Dest is a file object, metadata is a metadata list.
+# Only exists to be able to 'apply' the $setMeta function since it's technically not a function...
+  # Input checking
+  if(typeof(metadata)!="list"||length(metadata)==0){stop("Error in gupdatemetadata.  Metadata is not a list or is empty",metadata)}
+  if(dest$class!="File"){stop("Error in gupdatemetadata. Dest is not a file",dest)}
+      if(length(metadata)){
   dest$setMeta(as.list(metadata))} # Let's only set it if it's a real thing...
 } # Sets the metadata of a file on sbc to that presented in the metadatatable file [based on filename, only for fastqs].
 
 
 # Define findfile function:   Searches sbc project for a file
 # Avoids awkwardness around the default search only searching top100 files
-findfile<-function(name,p,...){
   offset<-0
   while(length(p$file(offset=offset))==100){
     offset<-offset+100
@@ -41,11 +42,16 @@ statuscheck<-function(x,p){
   return(paste0(tsk$name,"UNKNOWN_STATUS"))}
 # TODO test to see if this is a good way to handle running tasks.  Seems okay with stalled tasks.
 
-copymetadata<-function(tskid,p){
+copymetadata<-function(tskid,src,p){
+# Copy metadata from a source file to a task's output file list
+# Intended to be used to set metadata on task output based on task input...
+# @tskid - a SBC task id number
+# @src - a SBC File object
+# @p - a SBC Project object
   filelist<-p$task(id=tskid)$file() # only the output files
-  source<-findfile(p$task(id=tskid)$inputs$input_archive_file$name,p) # the relevant input file if we're dealing with alignments, but not in general...
-  fastqmetadata <- read.table(file="metadatatable.txt",sep=",",stringsAsFactors = FALSE,header = TRUE,colClasses = c(rep("character",10)))
-  lapply(filelist,gupdatemetadata,p=p,fastqmetadata=fastqmetadata,src=source)
+  metadata<-src$meta()
+  metadata<-metadata[1:length(metadata)] # required to get rid of some weird API headers...
+  lapply(filelist,gupdatemetadata,metadata=metadata)
 
 } # function that exists to push metadata across an entire set of output.
 # TODO: Determine if/when metadata [eg: paired_end and platform_unit_id] shouldn't be applied to downstream files
