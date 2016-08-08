@@ -48,11 +48,9 @@ gmeta<-function(dest){
 # Define findfile function:   Searches sbc project for a file
 # Avoids awkwardness around the default search only searching top100 files
 findfile<-function(name,p=p,...){
-  offset<-0
-  while(length(p$file(offset=offset))==100){
-    offset<-offset+100
-  }# Count the total number of files
-  maxoffset<-offset
+# Inputs: Name = filename to search for
+# P : Project to look within
+  maxoffset<-floor(length(p$file(limit=0))/100) # Count all files
   offset<-0
   while(offset <= maxoffset){
     if(!is.null(p$file(name=name,offset=offset,...))){return(p$file(name=name,offset=offset,...))}
