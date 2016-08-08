@@ -37,8 +37,9 @@ tnames<-unlist(lapply(tnames,"[[","sample_name"))
 if(length(sampleglist)!=length(gnames)){stop("Number of sample names(glist) is not equal to number of samples found.")}
 if(length(sampletlist)!=length(tnames)){stop("Number of sample names(tlist) is not equal to number of samples found.")}
 
-p$task_add(app=p$app(name="mergecounts")$id,inputs=list(source_file=sampleglist,outputfilename=paste0(Labid,"Gene_Counts.csv"),Column=5,names=paste(gnames,collapse=","))) # Column 5 is the expected count value.  Again, specific to star/rsem.
-p$task_add(app=p$app(name="mergecounts")$id,inputs=list(source_file=sampletlist,outputfilename=paste0(Labid,"Transcript_Counts.csv"),Column=5,names=paste(tnames,collapse=","))) 
-
+gtask<-p$task_add(app=p$app(name="mergecounts")$id,inputs=list(source_file=sampleglist,outputfilename=paste0(Labid,"_Gene_Counts"),Column=5,names=paste(gnames,collapse=","))) # Column 5 is the expected count value.  Again, specific to star/rsem.
+ttask<-p$task_add(app=p$app(name="mergecounts")$id,inputs=list(source_file=sampletlist,outputfilename=paste0(Labid,"_Transcript_Counts"),Column=5,names=paste(tnames,collapse=","))) 
+gtask$run()
+ttask$run()
 ```
 
