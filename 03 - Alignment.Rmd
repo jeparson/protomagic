@@ -97,7 +97,7 @@ lapply(tsklist,statuscheck,p)
 
 # Set metadata of output files.
 srclist<-lapply(tsklist,FUN = function(x,p){findfile(p$task(id=x)$inputs$input_archive_file$name,p)},p)
-mapply(FUN = copymetadata,tsklist,srclist,MoreArgs=list(p)) # this is what i'd like to do, so i just need to make copymetadata work how i want it to
+mapply(FUN = copymetadata,tsklist,srclist,MoreArgs=list(p)) # take the srclist [all of the input fastq files] and copy the metadata to the outputs of tsklist
 
 # DEBUG print(tsklist)
 # TODO apply metadata to output bam files
