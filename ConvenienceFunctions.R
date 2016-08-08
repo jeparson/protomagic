@@ -2,6 +2,30 @@
 #TODO : Should this script set the project and authorization since they're used everywhere?
 #TODO : Add Site to metadata in an appropriate location[SampleID/Investigation/Batch_number]
 
+requirelist<-function(crpackages=NULL,bcpackages=NULL,ghpackages=NULL,quietly=TRUE){
+# Inputs:  List of packages available on cran.  List of packages available on bioconductor.  List of packages available on github.
+  if(!is.null(crpackages)){
+    if(length(crpackages[!crpackages%in%installed.packages()])){
+      install.packages(crpackages[!crpackages%in%installed.packages()])
+    }
+  }
+  if(!is.null(bcpackages)){
+    if(length(bcpackages[!bcpackages%in%installed.packages()])){
+      source("http://bioconductor.org/biocLite.R")
+      BiocInstaller::biocLite(bcpackages[!bcpackages%in%installed.packages()])
+    }
+  }
+  if(!is.null(ghpackages)){
+    if(length(ghpackages[!ghpackages%in%installed.packages()])){
+      if(!"devtools"%in%installed.packages()){install.packages("devtools")}
+     devtools::install_github(repo = ghpackages[!ghpackages%in%installed.packages()])
+    }
+  }
+  for(I in c(crpackages,bcpackages,ghpackages)){
+    require(I,quietly=quietly,character.only=TRUE)
+  }
+} # Makes a list of packages needed within a script.  Installs if needed, then loads.
+
 updatemetadata<-function(x,p,fastqmetadata=fastqmetadata){
   metadata<-fastqmetadata[fastqmetadata[,1]==x,2:length(fastqmetadata)]
   findfile(name=x,p,exact = TRUE)$setMeta(as.list(metadata)) # actually works now that the formatting in metadatatable is correct
@@ -17,10 +41,13 @@ gupdatemetadata<-function(dest,metadata){
       if(length(metadata)){
   dest$setMeta(as.list(metadata))} # Let's only set it if it's a real thing...
 } # Sets the metadata of a file on sbc to that presented in the metadatatable file [based on filename, only for fastqs].
-
+gmeta<-function(dest){
+  return(dest$meta())
+} # Returns the metadata of a file object.  Again, just a convenience wrapper because I don't know how to apply a function within a class...
 
 # Define findfile function:   Searches sbc project for a file
 # Avoids awkwardness around the default search only searching top100 files
+findfile<-function(name,p=p,...){
   offset<-0
   while(length(p$file(offset=offset))==100){
     offset<-offset+100
