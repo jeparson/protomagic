@@ -10,21 +10,27 @@ knitr::opts_chunk$set(echo = FALSE)
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
-```{r, echo=FALSE}
+```{r setup2, echo=FALSE}
 require(sevenbridges)
 sevenbridgesapitoken="68916d51f8ba48c1a87a47f135bafef0"
 authurl="https://api.sbgenomics.com/v2/"
 a<-Auth(sevenbridgesapitoken,url=authurl)
 p<-a$project(name = "prototypeercc2",exact=TRUE)
+source("ConvenienceFunctions.R") # Load convenience functions such as gmeta
 ```
 
 ```{r}
+metadatatable<-read.csv("metadatatable.txt")
+Labid<-levels(as.factor(metadatatable$investigation))
 # merge all of the individual run counts into a single master count table
 sampleglist<-p$file(name="genes.results") # this is specific to the STAR/RSEM output
-sampletlist<-p$file(name="isoforms.results") 
+sampletlist<-p$file(name="isoforms.results") # as is this.
 # select all individual run counts
 # this app is defined by dmergecounts.R and runs mergecounts.R
+gnames<-lapply(sampleglist,FUN = gmeta) # extracts the metadata
+gnames<-unlist(lapply(gnames,"[[","sample_name")) # extracts just the samplenames
 
+p$task_add(app=p$app(name="mergecounts")$id,inputs=list(source_file=sampleglist,outputfilename=paste0(Labid,"Gene_Counts.csv"),Column=5,names=gnames)) # Column 5 is the expected count value.  Again, specific to star/rsem.
 # list output files from Alignment
 
 # list all outputs file from a task id
