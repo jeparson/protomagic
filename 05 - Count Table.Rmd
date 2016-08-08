@@ -23,21 +23,22 @@ source("ConvenienceFunctions.R") # Load convenience functions such as gmeta
 metadatatable<-read.csv("metadatatable.txt")
 Labid<-levels(as.factor(metadatatable$investigation))
 # merge all of the individual run counts into a single master count table
-sampleglist<-p$file(name="genes.results") # this is specific to the STAR/RSEM output
-sampletlist<-p$file(name="isoforms.results") # as is this.
-# select all individual run counts
+sampleglist<-p$file(name="genes.results",limit=0) # this is specific to the STAR/RSEM output
+sampletlist<-p$file(name="isoforms.results",limit=0) # as is this.
+# TODO: Make the generation of sampleglist and sampletlist not specific to particular outputs [use tkslist? A switch statement?]
+
 # this app is defined by dmergecounts.R and runs mergecounts.R
 gnames<-lapply(sampleglist,FUN = gmeta) # extracts the metadata
 gnames<-unlist(lapply(gnames,"[[","sample_name")) # extracts just the samplenames
+tnames<-lapply(sampletlist,FUN = gmeta)
+tnames<-unlist(lapply(tnames,"[[","sample_name"))
 
-p$task_add(app=p$app(name="mergecounts")$id,inputs=list(source_file=sampleglist,outputfilename=paste0(Labid,"Gene_Counts.csv"),Column=5,names=gnames)) # Column 5 is the expected count value.  Again, specific to star/rsem.
-# list output files from Alignment
+# minor sanity checking:
+if(length(sampleglist)!=length(gnames)){stop("Number of sample names(glist) is not equal to number of samples found.")}
+if(length(sampletlist)!=length(tnames)){stop("Number of sample names(tlist) is not equal to number of samples found.")}
 
-# list all outputs file from a task id
-a$task(id = alignmenttask)$file()
-# get those files
-#
-
+p$task_add(app=p$app(name="mergecounts")$id,inputs=list(source_file=sampleglist,outputfilename=paste0(Labid,"Gene_Counts.csv"),Column=5,names=paste(gnames,collapse=","))) # Column 5 is the expected count value.  Again, specific to star/rsem.
+p$task_add(app=p$app(name="mergecounts")$id,inputs=list(source_file=sampletlist,outputfilename=paste0(Labid,"Transcript_Counts.csv"),Column=5,names=paste(tnames,collapse=","))) 
 
 ```
 
