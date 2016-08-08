@@ -47,10 +47,10 @@ gmeta<-function(dest){
 
 # Define findfile function:   Searches sbc project for a file
 # Avoids awkwardness around the default search only searching top100 files
-findfile<-function(name,p=p,...){
+findfile<-function(name,proj=p,...){
 # Inputs: Name = filename to search for
 # P : Project to look within
-return(p$file(name=name,limit=0,...))
+return(proj$file(name=name,limit=0,...))
 } # TODO: Fully deprecate this function; findfile is no longer really relevant, but it's called a lot...
 
 statuscheck<-function(x,p){
