@@ -50,13 +50,8 @@ gmeta<-function(dest){
 findfile<-function(name,p=p,...){
 # Inputs: Name = filename to search for
 # P : Project to look within
-  maxoffset<-floor(length(p$file(limit=0))/100) # Count all files
-  offset<-0
-  while(offset <= maxoffset){
-    if(!is.null(p$file(name=name,offset=offset,...))){return(p$file(name=name,offset=offset,...))}
-    offset<-offset+100}
-  return(NULL)
-} # findfile
+return(p$file(name=name,limit=0,...))
+} # TODO: Fully deprecate this function; findfile is no longer really relevant, but it's called a lot...
 
 statuscheck<-function(x,p){
   tsk=p$task(id=x)
