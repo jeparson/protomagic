@@ -15,13 +15,17 @@ ERCC Dashboard
 
 ```{R}
 # run the ERCC Dashboard on the appropriate count tables
+# output from previous file:
+metadatatable<-read.csv("metadatatable.txt")
+Labid<-levels(as.factor(metadatatable$investigation))
+mastercounttbl<-paste0(Labid,"_Transcript_Counts")
 # this cloud app is defined by definedashboard.R and runs runDashboard.R.
   appid=p$app(name="runDashboardBeta")$id
-    tsk <- p$task_add(name = paste("Beta_Dashboard_Analysis",sampleid,sep="_"), 
+    DBtsk <- p$task_add(name = paste("Beta_Dashboard_Analysis",sampleid,sep="_"), 
            description = paste("ERCC_Dashboard_Analysis of",sampleid,sep="_"), 
            app = appid,
            inputs = list(
-              filenameRoot=NIST_HiSeq_Mixes,
+              filenameRoot=sampleid,
               isNorm= FALSE,
               sample1Name: MixM,
               sample2Name: MixL,
@@ -33,8 +37,10 @@ ERCC Dashboard
               erccmix="RatioPair"
            )
 )
-    tsk$run()
+    DBtsk$run()
 ```
-```{r}
-#Display output from dashboard.
+```{r output}
+Figs<-p$file(id=DBtsk$outputs$DashboardFigures$path,limit=0)
+DBobject<-p$file(id=DBtsk$outputs$data$path,limit=0)
+# Display output from dashboard.
 ```
