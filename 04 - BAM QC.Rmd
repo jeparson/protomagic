@@ -41,6 +41,6 @@ ifq<-p$task_add(app=p$app(name="SAMtools Index FASTA")$id,inputs=list(input_fast
 # Run RNA-sEQC
 bamlist<-p$file(name=".sorted.bam$",limit=0) # Temporary easy identification of files for testing purposes. 
 # TODO: Make this search tsklist or something.
-RSEQC<-p$task_add(app=p$app(name="RNA-SeQC")$id,inputs=list(bam_files=bamlist),transcripts=findfile(refgtf),reference=findfile("merged.fasta"))
-# TODO: See if the above task actually does what it's supposed to.
+RSEQC<-p$task_add(app=p$app(name="RNA-SeQC")$id,inputs=list(bam_files=bamlist,transcripts=findfile(refgtf,exact=TRUE),reference=findfile("merged.fasta",exact=TRUE),transcript_type=2))
+# TODO: If the output proves relevant, add transcript_details=TRUE and strictMode=TRUE)
 ```
