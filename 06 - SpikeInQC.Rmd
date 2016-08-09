@@ -16,7 +16,7 @@ ERCC Dashboard
 ```{R}
 # run the ERCC Dashboard on the appropriate count tables
 # output from previous file:
-metadatatable<-read.csv("metadatatable.txt")
+metadatatable <- read.table(file="metadatatable.txt",sep=",",stringsAsFactors = FALSE,header = TRUE,colClasses = c(rep("character",10)))
 Labid<-levels(as.factor(metadatatable$investigation))
 mastercounttbl<-paste0(Labid,"_Transcript_Counts")
 # this cloud app is defined by definedashboard.R and runs runDashboard.R.

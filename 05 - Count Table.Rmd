@@ -20,7 +20,7 @@ source("ConvenienceFunctions.R") # Load convenience functions such as gmeta
 ```
 
 ```{r}
-metadatatable<-read.csv("metadatatable.txt")
+metadatatable <- read.table(file="metadatatable.txt",sep=",",stringsAsFactors = FALSE,header = TRUE,colClasses = c(rep("character",10)))
 Labid<-levels(as.factor(metadatatable$investigation))
 # merge all of the individual run counts into a single master count table
 sampleglist<-p$file(name="genes.results",limit=0) # this is specific to the STAR/RSEM output
