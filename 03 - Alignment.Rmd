@@ -74,11 +74,11 @@ for(fastq in sbfastqlist){
 "2" = {fastq2<-fastq})
 # TODO check to see if the output exists.
 # check to make sure that fastq1 and fastq2 are actually the same sample
-  if(fastq1$meta()$batch_number!=fastq2$meta()$batch_number){stop("fastq1 and fastq2 are not the same sample: please sort your fastqmetadata file by sample!")}
+  if(fastq1$meta()$sample_id!=fastq2$meta()$sample_id){stop("fastq1 and fastq2 are not the same sample: please sort your fastqmetadata file by sample!")}
 # prepare to run the app 
   
-    sampleid=fastq1$metadata$batch_number
-    if(is.null(sampleid)){stop("batch_number not set for ",fastq)}
+    sampleid=fastq1$metadata$sample_id
+    if(is.null(sampleid)){stop("sample_id not set for ",fastq)}
     appid<-p$app(name="STAR-RSEM")$id
     
     tsk <- p$task_add(name = paste("STAR-rsem",sampleid,sep="_"), 

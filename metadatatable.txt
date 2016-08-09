@@ -1,4 +1,4 @@
-Fastq filename,experimental_strategy,library_id,platform,platform_unit_id,paired_end,reference_genome,sample_id,sample_type,investigation,species,batch_number
+Fastq filename,experimental_strategy,library_id,platform,platform_unit_id,paired_end,reference_genome,batch_number,sample_type,investigation,species,sample_id
 MixA1_S1_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S1
 MixA1_S1_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S1
 MixA2_S9_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S2

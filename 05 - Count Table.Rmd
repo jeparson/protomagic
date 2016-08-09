@@ -29,9 +29,9 @@ sampletlist<-p$file(name="isoforms.results",limit=0) # as is this.
 
 # this app is defined by dmergecounts.R and runs mergecounts.R
 gnames<-lapply(sampleglist,FUN = gmeta) # extracts the metadata
-gnames<-unlist(lapply(gnames,"[[","sample_name")) # extracts just the samplenames
+gnames<-unlist(lapply(gnames,"[[","sample_id")) # extracts just the samplenames
 tnames<-lapply(sampletlist,FUN = gmeta)
-tnames<-unlist(lapply(tnames,"[[","sample_name"))
+tnames<-unlist(lapply(tnames,"[[","sample_id"))
 
 # minor sanity checking:
 if(length(sampleglist)!=length(gnames)){stop("Number of sample names(glist) is not equal to number of samples found.")}
@@ -41,5 +41,6 @@ gtask<-p$task_add(app=p$app(name="mergecounts")$id,inputs=list(source_file=sampl
 ttask<-p$task_add(app=p$app(name="mergecounts")$id,inputs=list(source_file=sampletlist,outputfilename=paste0(Labid,"_Transcript_Counts"),Column=5,names=paste(tnames,collapse=","))) 
 gtask$run()
 ttask$run()
+# TODO:  Apply metadata to the output file if/as necessary.
 ```
 
