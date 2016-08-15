@@ -8,31 +8,54 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 knitr::opts_chunk$set(cache = TRUE)#have to cache for some of this DE to be iteratively useful.
+source("ConvenienceFunctions.R")
+requirelist(bcpackages=c("S4Vectors","GenomicFeatures","SummarizedExperiment"))
 ```
 
 Now to calculate differential expression.
 
-We need to subselect various replicates of each type of sample.
+We need to make a useful R object with all of the experimental data in it.
 ```{r,echo=TRUE}
-# Some code to select samples simply
-choosesamples<-function(types){
-  # picks out the samples of the chosen types:
-  # loads the experimental design document off of gh
-  experimentaldesignfile="github.com/jeparson/protomagic/SampleDesign.csv"
-    expdesign<-read.table(experimentaldesignfile,sep="\t",header=TRUE)
-  
-  
-  
-}
-
+# The counts
+mastertable<-"tools/tests/NIST_MM1_Transcript_Counts.csv"
+mastercounts<-read_csv(mastertable)
+# ForNow: Let's make these counts integer.
+mastercounts[,2:length(mastercounts)]<-round(mastercounts[,2:length(mastercounts)])
+# The metadata 
+expdesign<-S4Vectors::DataFrame(read.table(experimentaldesignfile,sep="\t",header=TRUE))
+expdesign$mix<-factor(c(rep("M",6),rep("L",6),rep("LM",6),rep("blah",6)))
+if(colnames(mastercounts)[2:length(mastercounts)])
 ```
+Just to double check that there are no significant amounts of SIRVs present in the samples
+where we didn't add SIRVs:
+```{r sanity}
+# Expectation NOSIRV: S11/S18/S5/S12/S6/S17: Perfect 
+colSums(fullcounts[grep("SIRV",fullcounts$transcript_id),2:length(fullcounts)])>(colSums(fullcounts[,2:length(fullcounts)])*0.01)
+```
+
 We then need to do DE testing of various pairwise comparisons.
 
 ```{r,echo=FALSE}
-DEdata<-DESeq2::DESeqDataSet(countData = mastercounts,colData=colnames(expdesign),design = tabletodeseq(expdesign))
+dds<-DESeqDataSetFromMatrix(fullcounts[,2:length(fullcounts)],colData = expdesign[1:18,],design = ~ mix + erccspike + sirvspike + sirvspike:mix) # the interaction term being the relevant measure of interference
+dds<-DESeq(dds)
+```
+A heatmap of the samples
+```{r}
 
-tabletodeseq<-function(table){
-  #convert the tabular design of the experimental design file into an experimental design that DESeq understands...
-}
-
+library("pheatmap")
+library("RColorBrewer")
+rld <- rlog(dds, blind=FALSE)
+sampleDists <- dist( t( assay(rld) ) )
+sampleDistMatrix <- as.matrix( sampleDists )
+rownames(sampleDistMatrix) <- paste(colData(rld)$mix,colData(rld)$sirvspike,colData(rld)$erccspike)[c(11,18,5,9,3,14,7,2,12,4,13,8,17,1,6,16,15,10)] # LAZY
+colnames(sampleDistMatrix) <- NULL
+colors <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
+pheatmap(sampleDistMatrix,
+         clustering_distance_rows=sampleDists,
+         clustering_distance_cols=sampleDists,
+         col=colors)
+```
+And finally just for posterity...
+```{r}
+sessionInfo()
 ```
