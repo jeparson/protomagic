@@ -98,10 +98,25 @@ lapply(tsklist,statuscheck,p)
 # Set metadata of output files.
 srclist<-lapply(tsklist,FUN = function(x,p){findfile(p$task(id=x)$inputs$input_archive_file$name,p)},p)
 mapply(FUN = copymetadata,tsklist,srclist,MoreArgs=list(p)) # take the srclist [all of the input fastq files] and copy the metadata to the outputs of tsklist
+# Also set the ReadGroup headers in the bam files
 
-# DEBUG print(tsklist)
-# TODO apply metadata to output bam files
-# TODO identify the appropriate output files for the next steps: transcriptome_aligned_reads, reads_per_gene, bam
-# TODO generate app and task to merge all reads_per_isoform files to make the master count table [05 - count table.rmd]
-# TODO 
+lapply(tsklist,ReHeaderSTARbam,proj=p)
+ReHeaderSTARbam<-function(task,proj){
+  #` @task - task (ID number) 
+  #` @proj - project object
+  # Takes the bam outputs of an alignment task and writes a SAM header corresponding to the metadata
+  
+infile<-findfile(paste0(gsub(x=proj$task(id=task)$outputs$sample_name_files[[4]]$name,pattern="_1_",replacement=""),"$")) # Fix for the beta execution of this task with duplicate files...)
+#infile<-findfile(paste0(proj$task(id=task)$outputs$sample_name_files[[4]]$name,"$")) # TODO: Swap with previous line for production.  Identifies the correct bam file & makes sure we're not pulling its .bai. 
+infile$meta() # Makes sure the metadata is pulled down. 
+reheader<-proj$task_add(app=proj$app(name="Picard AddOrReplaceReadGroups")$id,inputs = list(read_group_sample_name=infile$metadata$sample_id,read_group_platform_unit=infile$metadata$platform_unit_id,
+                                                                                      read_group_platform=infile$metadata$platform,read_group_lib=infile$metadata$library_id,input_bam=infile))
+reheader$run() 
+}
+# Now all of the bams are .sorted.edited.bam : 
+# TODO: It's probably also worth considering a cleanup step to get rid of the 2 unneeded copies of the bam?
+
+# TODO : Make Sure that all of the metadata in my metadatatable matches the requested profiles & is appropriate to carry forward & has been propogated appropriately through output files.
+# TODO : Execute the ReHeaderSTARbam function and test that it works.  Unfortunately, renaming happened so i have to (temporarily) do an ugly gsub  
+
 ````
