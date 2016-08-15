@@ -38,9 +38,13 @@ refgtf="merged.gtf" # until it's renamed, at least.
 # Preliminary:  Index the fastq [and maybe rename it to a fasta.]
 findfile(reffq)$copyTo(project = "lharris/ercc2pipeline",name="merged.fasta")
 ifq<-p$task_add(app=p$app(name="SAMtools Index FASTA")$id,inputs=list(input_fasta_file=findfile("merged.fasta"))) # TODO: Replace all of the instances of 'merged.x' with something that's more appropriate.
+
+
 # Run RNA-sEQC
-bamlist<-p$file(name=".sorted.bam$",limit=0) # Temporary easy identification of files for testing purposes. 
+bamlist<-p$file(name=".sorted.edited.bam$",limit=0) # Temporary easy identification of files for testing purposes. 
 # TODO: Make this search tsklist or something.
 RSEQC<-p$task_add(app=p$app(name="RNA-SeQC")$id,inputs=list(bam_files=bamlist,transcripts=findfile(refgtf,exact=TRUE),reference=findfile("merged.fasta",exact=TRUE),transcript_type=2))
+# TODO: Make a GTF that RSEQC actually likes [it's not a fan of the GENE entries in the gtf: i guess i'll just do a grep -v ?]
+# TODO: Figure out what ACTUALLY is required to make a good gtf, because that is insufficient...
 # TODO: If the output proves relevant, add transcript_details=TRUE and strictMode=TRUE)
 ```
