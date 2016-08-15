@@ -27,8 +27,19 @@ requirelist<-function(crpackages=NULL,bcpackages=NULL,ghpackages=NULL,quietly=TR
 } # Makes a list of packages needed within a script.  Installs if needed, then loads.
 
 updatemetadata<-function(x,p,fastqmetadata=fastqmetadata){
-  metadata<-fastqmetadata[fastqmetadata[,1]==x,2:length(fastqmetadata)]
+  #` @x File name
+  #` @p project object
+  #` @fastqmetadata table
+    metadata<-fastqmetadata[fastqmetadata[,1]==x,2:length(fastqmetadata)]
   findfile(name=x,p,exact = TRUE)$setMeta(as.list(metadata)) # actually works now that the formatting in metadatatable is correct
+} # Sets the metadata of a file on sbc to that presented in the metadatatable file [based on filename, only for fastqs].
+# TODO: Merge these two functions as a switch on typeof X
+updatemetadatan<-function(x,p,fastqmetadata=fastqmetadata){
+  #` @x File object
+  #` @p project object
+  #` @fastqmetadata table
+  metadata<-fastqmetadata[fastqmetadata[,1]==x$name,2:length(fastqmetadata)]
+  x$setMeta(as.list(metadata)) # actually works now that the formatting in metadatatable is correct
 } # Sets the metadata of a file on sbc to that presented in the metadatatable file [based on filename, only for fastqs].
 
 
@@ -66,7 +77,6 @@ copymetadata<-function(tskid,src,p){
 # Copy metadata from a source file to a task's output file list
 # Intended to be used to set metadata on task output based on task input...
 # @tskid - a SBC task id number
-# @src - a SBC File object
 # @p - a SBC Project object
   filelist<-p$task(id=tskid)$file() # only the output files
   metadata<-src$meta()
