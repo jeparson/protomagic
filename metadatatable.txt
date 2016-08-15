@@ -1,49 +1,49 @@
 Fastq filename,experimental_strategy,library_id,platform,platform_unit_id,paired_end,reference_genome,batch_number,sample_type,investigation,species,sample_id
-MixA1_S1_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S1
-MixA1_S1_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S1
-MixA2_S9_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S2
-MixA2_S9_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S2
-MixA3_S17_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S3
-MixA3_S17_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S3
-MixA4_S2_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S4
-MixA4_S2_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S4
-MixA5_S10_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S5
-MixA5_S10_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S5
-MixA6_S18_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S6
-MixA6_S18_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S6
-MixB1_S3_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S7
-MixB1_S3_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S7
-MixB2_S11_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S8
-MixB2_S11_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S8
-MixB3_S19_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S9
-MixB3_S19_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S9
-MixB4_S4_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S10
-MixB4_S4_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S10
-MixB5_S12_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S11
-MixB5_S12_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S11
-MixB6_S20_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S12
-MixB6_S20_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S12
-MixC1_S5_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S13
-MixC1_S5_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S13
-MixC2_S13_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S14
-MixC2_S13_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S14
-MixC3_S21_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S15
-MixC3_S21_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S15
-MixC4_S6_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S16
-MixC4_S6_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S16
-MixC5_S14_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S17
-MixC5_S14_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S17
-MixC6_S22_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S18
-MixC6_S22_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S18
-samB1_S7_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S19
-samB1_S7_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S19
-samB2_S15_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S20
-samB2_S15_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S20
-samL1_S23_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S21
-samL1_S23_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S21
-samL2_S8_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S22
-samL2_S8_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S22
-samM1_S16_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S23
-samM1_S16_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S23
-samM2_S24_L001_R1_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S24
-samM2_S24_L001_R2_001.fastq.gz,RNA-Seq,Truseq,Illumina HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S24
+MixA1_S1_L001_R1_001.fastq.gz,RNA-Seq,MM_S1,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S1
+MixA1_S1_L001_R2_001.fastq.gz,RNA-Seq,MM_S1,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S1
+MixA2_S9_L001_R1_001.fastq.gz,RNA-Seq,MM_S2,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S2
+MixA2_S9_L001_R2_001.fastq.gz,RNA-Seq,MM_S2,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S2
+MixA3_S17_L001_R1_001.fastq.gz,RNA-Seq,MM_S3,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S3
+MixA3_S17_L001_R2_001.fastq.gz,RNA-Seq,MM_S3,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S3
+MixA4_S2_L001_R1_001.fastq.gz,RNA-Seq,MM_S4,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S4
+MixA4_S2_L001_R2_001.fastq.gz,RNA-Seq,MM_S4,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S4
+MixA5_S10_L001_R1_001.fastq.gz,RNA-Seq,MM_S5,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S5
+MixA5_S10_L001_R2_001.fastq.gz,RNA-Seq,MM_S5,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S5
+MixA6_S18_L001_R1_001.fastq.gz,RNA-Seq,MM_S6,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S6
+MixA6_S18_L001_R2_001.fastq.gz,RNA-Seq,MM_S6,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S6
+MixB1_S3_L001_R1_001.fastq.gz,RNA-Seq,MM_S7,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S7
+MixB1_S3_L001_R2_001.fastq.gz,RNA-Seq,MM_S7,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S7
+MixB2_S11_L001_R1_001.fastq.gz,RNA-Seq,MM_S8,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S8
+MixB2_S11_L001_R2_001.fastq.gz,RNA-Seq,MM_S8,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S8
+MixB3_S19_L001_R1_001.fastq.gz,RNA-Seq,MM_S9,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S9
+MixB3_S19_L001_R2_001.fastq.gz,RNA-Seq,MM_S9,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S9
+MixB4_S4_L001_R1_001.fastq.gz,RNA-Seq,MM_S10,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S10
+MixB4_S4_L001_R2_001.fastq.gz,RNA-Seq,MM_S10,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S10
+MixB5_S12_L001_R1_001.fastq.gz,RNA-Seq,MM_S11,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S11
+MixB5_S12_L001_R2_001.fastq.gz,RNA-Seq,MM_S11,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S11
+MixB6_S20_L001_R1_001.fastq.gz,RNA-Seq,MM_S12,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S12
+MixB6_S20_L001_R2_001.fastq.gz,RNA-Seq,MM_S12,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S12
+MixC1_S5_L001_R1_001.fastq.gz,RNA-Seq,MM_S13,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S13
+MixC1_S5_L001_R2_001.fastq.gz,RNA-Seq,MM_S13,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S13
+MixC2_S13_L001_R1_001.fastq.gz,RNA-Seq,MM_S14,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S14
+MixC2_S13_L001_R2_001.fastq.gz,RNA-Seq,MM_S14,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S14
+MixC3_S21_L001_R1_001.fastq.gz,RNA-Seq,MM_S15,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S15
+MixC3_S21_L001_R2_001.fastq.gz,RNA-Seq,MM_S15,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S15
+MixC4_S6_L001_R1_001.fastq.gz,RNA-Seq,MM_S16,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S16
+MixC4_S6_L001_R2_001.fastq.gz,RNA-Seq,MM_S16,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S16
+MixC5_S14_L001_R1_001.fastq.gz,RNA-Seq,MM_S17,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S17
+MixC5_S14_L001_R2_001.fastq.gz,RNA-Seq,MM_S17,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S17
+MixC6_S22_L001_R1_001.fastq.gz,RNA-Seq,MM_S18,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S18
+MixC6_S22_L001_R2_001.fastq.gz,RNA-Seq,MM_S18,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S18
+samB1_S7_L001_R1_001.fastq.gz,RNA-Seq,MM_S19,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S19
+samB1_S7_L001_R2_001.fastq.gz,RNA-Seq,MM_S19,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S19
+samB2_S15_L001_R1_001.fastq.gz,RNA-Seq,MM_S20,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S20
+samB2_S15_L001_R2_001.fastq.gz,RNA-Seq,MM_S20,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S20
+samL1_S23_L001_R1_001.fastq.gz,RNA-Seq,MM_S21,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S21
+samL1_S23_L001_R2_001.fastq.gz,RNA-Seq,MM_S21,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S21
+samL2_S8_L001_R1_001.fastq.gz,RNA-Seq,MM_S22,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S22
+samL2_S8_L001_R2_001.fastq.gz,RNA-Seq,MM_S22,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S22
+samM1_S16_L001_R1_001.fastq.gz,RNA-Seq,MM_S23,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S23
+samM1_S16_L001_R2_001.fastq.gz,RNA-Seq,MM_S23,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S23
+samM2_S24_L001_R1_001.fastq.gz,RNA-Seq,MM_S24,Illumina_HiSeq,L001,1,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S24
+samM2_S24_L001_R2_001.fastq.gz,RNA-Seq,MM_S24,Illumina_HiSeq,L001,2,HG19ERCCSIRV,ERCC_3_Mixes,Tissue_RNA,NIST_MM1,Homo sapiens,MM_S24

@@ -85,7 +85,7 @@ inputs = IPList(
     default="RatioPair",
     position=10)
   ),
-outputs=list(output(type = ItemArray("File"),id = 'DashboardFigures',glob = "*.pdf"),output(id='data',glob="*.rData",type="file"))
+outputs=list(output(type = ItemArray("File"),id = 'DashboardFigures',glob = "*.pdf"),output(id='data',glob="*.rData",type="file",inheritMetadataFrom="source_file"))
 )
 
 p$app_add('runDashboardBeta',ERCCDashboard)
