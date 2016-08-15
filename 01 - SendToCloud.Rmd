@@ -27,7 +27,13 @@ fastqdir <-"/Volumes/Archive2b/RawData/HSMagicMix/fastq/"
 
 # Get fastq list
 fastqlist <- list.files(path = fastqdir,pattern = ".fastq*")
-erccproject <-"prototypeercc2"
+erccproject <-"prototypeercc2" 
+# This project should probably be unique to each participating lab so as to avoid issues.
+# EG: ERCC2-NIST
+# EG: ERCC2-Agilent
+# Project Setup
+# Copy over all apps:
+# Copy over the basic references.
 ```
 Second we need to collect some metadata.  
 You should have a file named metadatatable.txt with information appropriate to 
