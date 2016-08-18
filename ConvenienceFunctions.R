@@ -4,21 +4,25 @@
 
 requirelist<-function(crpackages=NULL,bcpackages=NULL,ghpackages=NULL,quietly=TRUE){
 # Inputs:  List of packages available on cran.  List of packages available on bioconductor.  List of packages available on github.
+# Github packages need to be either the url or the username/repo [things that can get fed to install_github].
+  plist<-installed.packages() # caching this list since it takes about a second to load.
   if(!is.null(crpackages)){
-    if(length(crpackages[!crpackages%in%installed.packages()])){
-      install.packages(crpackages[!crpackages%in%installed.packages()])
+    if(length(crpackages[!crpackages%in%plist])){
+      install.packages(crpackages[!crpackages%in%plist])
     }
   }
   if(!is.null(bcpackages)){
-    if(length(bcpackages[!bcpackages%in%installed.packages()])){
+    if(length(bcpackages[!bcpackages%in%plist])){
       source("http://bioconductor.org/biocLite.R")
-      BiocInstaller::biocLite(bcpackages[!bcpackages%in%installed.packages()])
+      BiocInstaller::biocLite(bcpackages[!bcpackages%in%plist])
     }
   }
   if(!is.null(ghpackages)){
-    if(length(ghpackages[!ghpackages%in%installed.packages()])){
-      if(!"devtools"%in%installed.packages()){install.packages("devtools")}
-     devtools::install_github(repo = ghpackages[!ghpackages%in%installed.packages()])
+    # Do a substitution of the username
+    ghlist<-unlist(lapply(ghpackages,FUN = function(x){last(strsplit(x,split="/")[[1]])})) # Element after the last slash.
+    if(length(ghlist[!ghlist%in%plist])){
+      if(!"devtools"%in%plist){install.packages("devtools")}
+     devtools::install_github(repo = ghpackages[!ghpackages%in%plist])
     }
   }
   for(I in c(crpackages,bcpackages,ghpackages)){

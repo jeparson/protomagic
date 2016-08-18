@@ -47,4 +47,6 @@ RSEQC<-p$task_add(app=p$app(name="RNA-SeQC")$id,inputs=list(bam_files=bamlist,tr
 # TODO: Make a GTF that RSEQC actually likes [it's not a fan of the GENE entries in the gtf: i guess i'll just do a grep -v ?]
 # TODO: Figure out what ACTUALLY is required to make a good gtf, because that is insufficient...
 # TODO: If the output proves relevant, add transcript_details=TRUE and strictMode=TRUE)
+
+## TODO:  Are the spikes good mimics? Torsten suggests: evaluate endogenous transcripts in a way similar to SIRV NMet Fig5
 ```
