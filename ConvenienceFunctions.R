@@ -19,7 +19,8 @@ requirelist<-function(crpackages=NULL,bcpackages=NULL,ghpackages=NULL,quietly=TR
   }
   if(!is.null(ghpackages)){
     # Do a substitution of the username
-    ghlist<-unlist(lapply(ghpackages,FUN = function(x){last(strsplit(x,split="/")[[1]])})) # Element after the last slash.
+    if(!"data.table"%in%plist){install.packages("data.table")}
+    ghlist<-unlist(lapply(ghpackages,FUN = function(x){data.table::last(strsplit(x,split="/")[[1]])})) # Element after the last slash.
     if(length(ghlist[!ghlist%in%plist])){
       if(!"devtools"%in%plist){install.packages("devtools")}
      devtools::install_github(repo = ghpackages[!ghpackages%in%plist])
