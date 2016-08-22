@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = FALSE)
 knitr::opts_chunk$set(cache = TRUE)#have to cache for some of this DE to be iteratively useful.
 source("ConvenienceFunctions.R")
-requirelist(bcpackages=c("S4Vectors","GenomicFeatures","SummarizedExperiment"),ghpackages = "jeparson/mixturesolutions",crpackages = c("ggplot2","plotly"))
+requirelist(bcpackages=c("S4Vectors","GenomicFeatures","limma","SummarizedExperiment","DESeq2"),ghpackages = "jeparson/mixturesolutions",crpackages = c("ggplot2","plotly"))
 experimentaldesignfile="SampleDesign.csv"
 ```
 
@@ -31,8 +31,8 @@ mastercounts<-mastercounts[,c("transcript_id",as.character(expdesign$sample))] #
 # The metadata 
 ```
 Just to double check that there are no significant amounts of SIRVs present in the samples
-where we didn't add SIRVs:
-```{r sanity}
+where we didn't add SIRVs: in prelim: 5,6,11,12,17,18
+```{r Sanity Check}
 # Expectation NOSIRV: S11/S18/S5/S12/S6/S17: Perfect 
 colSums(mastercounts[grep("SIRV",mastercounts$transcript_id),2:length(mastercounts)])>(colSums(mastercounts[,2:length(mastercounts)])*0.01)
 ```
@@ -44,7 +44,6 @@ dds<-DESeqDataSetFromMatrix(mastercounts[,2:length(mastercounts)],colData = expd
 dds<-DESeq(dds)
 rownames(dds)<-mastercounts[,1]
 ```
-A heatmap of the samples should make a checkerboard of the 3 mixes and be subclustered on the 3 different SIRV mixes.
 ```{r}
 
 library("pheatmap")
@@ -61,6 +60,8 @@ pheatmap(sampleDistMatrix,
          col=colors)
 plotPCA(rld,intgroup=c("mix","sirvspike"))
 ```
+A heatmap of the samples should make a checkerboard of the 3 mixes and be subclustered on the 3 different SIRV mixes.
+A PCA plot should show a similar 3x3 pattern, with the first PC being the mix and the second PC being the spike-ins [sirvs vary more than erccs in prelim, as present/absent trumps 2-fold difference]
 ```{r}
 ##TODO:  replace all of the quoted things here with the appropriate references to the expdesign file.
 res<-results(dds,contrast = c("mix","M","L")) # There should be a great deal of DE
@@ -83,7 +84,7 @@ isspike<-c(issirv,isercc)
 spikevec<-c(rep(0,length(rld)))
 spikevec[isspike]<-1
 theme_set(theme_bw(base_size=18))
-a<-ggplot(data=as.data.frame(res2))+geom_point(aes(x=log2(baseMean),y=log2FoldChange,col=padj<0.05,size=as.numeric(1+spikevec),pch=as.factor((spikevec)))) # Easy MA plots.  TODO: Annotate with SIRV/ERCC status so they can pop the way they're supposed to.  Size? Alpha? Col?
+a<-ggplot(data=as.data.frame(res2))+geom_point(aes(x=log2(baseMean),y=log2FoldChange,col=padj<0.05,size=as.numeric(1+spikevec),pch=as.factor((spikevec)))) # Easy MA plots.  
 plotly::ggplotly(a)
 ```
 The DE results should show that there are no DEG between samples that aren't different [besides the spikes]
@@ -93,9 +94,11 @@ hist(test[grep("SIRV|^DQ|^EN[0-9]",rownames(test),invert=TRUE),]$log2FoldChange)
 
 ```
 
-```{R}
+```{R Variance vs Concentration}
 # Variance vs Concentration [spikes vs endo]
-
+limma::voom(mastercounts[rowSums(mastercounts[,2:19])>32,2:19],plot=TRUE)
+```
+```{R}
 # Coefficient of Deviation [spikes vs endo]
 
 # Binned apparent LogFoldChanges for endogenous transcripts vs Spike-ins
@@ -103,7 +106,8 @@ hist(test[grep("SIRV|^DQ|^EN[0-9]",rownames(test),invert=TRUE),]$log2FoldChange)
 # RMSD from mixture model is unchanged:
 # General formula:  Sample / Mfrac[Self]* Mfrac [opposite.of.self] ~ Double + Nonself 
 # Double formula:  ??
-
+```
+```{R "Mixture Analysis"}
 mfrac<-c(mfrac,Mmix=mean(mfrac[names(mfrac)%in%expdesign$sample[expdesign$mix=="M"]]),Lmix=mean(mfrac[names(mfrac)%in%expdesign$sample[expdesign$mix=="L"]]),LMmix=mean(mfrac[names(mfrac)%in%expdesign$sample[expdesign$mix=="LM"]]))
 # Generates an average of each mix to model against, avoiding (or highlighting?) any effects due to 'bad' samples 
 mastercounts$Mmix<-rowMeans(mastercounts[,colnames(mastercounts)%in%expdesign$sample[expdesign$mix=="M"]])
