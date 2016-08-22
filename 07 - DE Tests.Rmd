@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = FALSE)
 knitr::opts_chunk$set(cache = TRUE)#have to cache for some of this DE to be iteratively useful.
 source("ConvenienceFunctions.R")
-requirelist(bcpackages=c("S4Vectors","GenomicFeatures","SummarizedExperiment"),ghpackages = "jeparson/mixturesolutions",crpackages = c("ggplot2","plotly")
+requirelist(bcpackages=c("S4Vectors","GenomicFeatures","SummarizedExperiment"),ghpackages = "jeparson/mixturesolutions",crpackages = c("ggplot2","plotly"))
 experimentaldesignfile="SampleDesign.csv"
 ```
 
@@ -19,7 +19,8 @@ We need to make a useful R object with all of the experimental data in it.
 ```{r,echo=TRUE}
 # The counts
 mastertable<-"tools/tests/NIST_MM1_Transcript_Counts.csv"
-mastercounts<-read_csv(mastertable)
+mastercounts<-read.csv(mastertable)
+mfrac<-calcmrnafracgeneral(mastercounts,spikeID="^DQ|^EN[0-9]") #spikeID is for the transcript names: These patterns match the ERCCs.  This prefers to be done before integer rounding...
 # ForNow: Let's make these counts integer.
 mastercounts[,2:length(mastercounts)]<-round(mastercounts[,2:length(mastercounts)])
 expdesign<-S4Vectors::DataFrame(read.table(experimentaldesignfile,sep="\t",header=TRUE))
@@ -100,12 +101,53 @@ hist(test[grep("SIRV|^DQ|^EN[0-9]",rownames(test),invert=TRUE),]$log2FoldChange)
 # Binned apparent LogFoldChanges for endogenous transcripts vs Spike-ins
 
 # RMSD from mixture model is unchanged:
+# General formula:  Sample / Mfrac[Self]* Mfrac [opposite.of.self] ~ Double + Nonself 
+# Double formula:  ??
 
-mixobj<-mixturesolutions::mixmetrics(mrnatype = "ercc",prenormalized = TRUE,modeltype="threemix",componentnames=c("LM","M","L"),mixnames = c("LM","M","L"),indf = mastercount,dds=expdesign,trueproportions = data.frame(L=c(2,-1,0),M=c(2,0,-1),LM=c(0,.5,.5)))
-# This is extraordinarily incomplete.  MixMetrics doesn't handle threemix at all, and it tries to automatically do collapsereplicates which is inappropriate here, among other things.
-# However, magicmodelsolve more or less says what it needs to do, even if it doesn't do it yet.
-
+mfrac<-c(mfrac,Mmix=mean(mfrac[names(mfrac)%in%expdesign$sample[expdesign$mix=="M"]]),Lmix=mean(mfrac[names(mfrac)%in%expdesign$sample[expdesign$mix=="L"]]),LMmix=mean(mfrac[names(mfrac)%in%expdesign$sample[expdesign$mix=="LM"]]))
+# Generates an average of each mix to model against, avoiding (or highlighting?) any effects due to 'bad' samples 
+mastercounts$Mmix<-rowMeans(mastercounts[,colnames(mastercounts)%in%expdesign$sample[expdesign$mix=="M"]])
+mastercounts$Lmix<-rowMeans(mastercounts[,colnames(mastercounts)%in%expdesign$sample[expdesign$mix=="L"]])
+mastercounts$LMmix<-rowMeans(mastercounts[,colnames(mastercounts)%in%expdesign$sample[expdesign$mix=="LM"]])
+# These models aren't quite built right; more mfrac corrections are required...
+# Value / SelfValue * OtherValue ~ lm + other / othervalue*selfvalue 
+mixmodeldf<-list(
+  S1=c(coefficients(lm(data=mastercounts,(I(MM_S1/mfrac["MM_S1"]*mfrac["Lmix"]))~LMmix+I(Lmix/mfrac["Lmix"]*mfrac["Mmix"])+0)),0),
+  S2=c(coefficients(lm(data=mastercounts,(I(MM_S2/mfrac["MM_S2"]*mfrac["Lmix"]))~LMmix+I(Lmix/mfrac["Lmix"]*mfrac["Mmix"])+0)),0),
+  S3=c(coefficients(lm(data=mastercounts,(I(MM_S3/mfrac["MM_S3"]*mfrac["Lmix"]))~LMmix+I(Lmix/mfrac["Lmix"]*mfrac["Mmix"])+0)),0),
+  S4=c(coefficients(lm(data=mastercounts,(I(MM_S4/mfrac["MM_S4"]*mfrac["Lmix"]))~LMmix+I(Lmix/mfrac["Lmix"]*mfrac["Mmix"])+0)),0),
+  S5=c(coefficients(lm(data=mastercounts,(I(MM_S5/mfrac["MM_S5"]*mfrac["Lmix"]))~LMmix+I(Lmix/mfrac["Lmix"]*mfrac["Mmix"])+0)),0),
+  S6=c(coefficients(lm(data=mastercounts,(I(MM_S6/mfrac["MM_S6"]*mfrac["Lmix"]))~LMmix+I(Lmix/mfrac["Lmix"]*mfrac["Mmix"])+0)),0),
+  S7=c(coefficients(lm(data=mastercounts,(I(MM_S7/mfrac["MM_S7"]*mfrac["Mmix"]))~LMmix+I(Mmix/mfrac["Mmix"]*mfrac["Lmix"])+0)),0),
+  S8=c(coefficients(lm(data=mastercounts,(I(MM_S8/mfrac["MM_S8"]*mfrac["Mmix"]))~LMmix+I(Mmix/mfrac["Mmix"]*mfrac["Lmix"])+0)),0),
+  S9=c(coefficients(lm(data=mastercounts,(I(MM_S9/mfrac["MM_S9"]*mfrac["Mmix"]))~LMmix+I(Mmix/mfrac["Mmix"]*mfrac["Lmix"])+0)),0),
+  S10=c(coefficients(lm(data=mastercounts,(I(MM_S10/mfrac["MM_S10"]*mfrac["Mmix"]))~LMmix+I(Mmix/mfrac["Mmix"]*mfrac["Lmix"])+0)),0),
+  S11=c(coefficients(lm(data=mastercounts,(I(MM_S11/mfrac["MM_S11"]*mfrac["Mmix"]))~LMmix+I(Mmix/mfrac["Mmix"]*mfrac["Lmix"])+0)),0),
+  S12=c(coefficients(lm(data=mastercounts,(I(MM_S12/mfrac["MM_S12"]*mfrac["Mmix"]))~LMmix+I(Mmix/mfrac["Mmix"]*mfrac["Lmix"])+0)),0),
+  S13=c(0,coefficients(lm(data=mastercounts,I(MM_S13/mfrac["MM_S13"])~I(Lmix/mfrac["Lmix"])+I(Mmix/mfrac["Mmix"])+0))),
+  S14=c(0,coefficients(lm(data=mastercounts,I(MM_S14/mfrac["MM_S14"])~I(Lmix/mfrac["Lmix"])+I(Mmix/mfrac["Mmix"])+0))),
+  S15=c(0,coefficients(lm(data=mastercounts,I(MM_S15/mfrac["MM_S15"])~I(Lmix/mfrac["Lmix"])+I(Mmix/mfrac["Mmix"])+0))),
+  S16=c(0,coefficients(lm(data=mastercounts,I(MM_S16/mfrac["MM_S16"])~I(Lmix/mfrac["Lmix"])+I(Mmix/mfrac["Mmix"])+0))),
+  S17=c(0,coefficients(lm(data=mastercounts,I(MM_S17/mfrac["MM_S17"])~I(Lmix/mfrac["Lmix"])+I(Mmix/mfrac["Mmix"])+0))),
+  S18=c(0,coefficients(lm(data=mastercounts,I(MM_S18/mfrac["MM_S18"])~I(Lmix/mfrac["Lmix"])+I(Mmix/mfrac["Mmix"])+0)))
+  )
+for(I in 7:12){mixmodeldf[[I]]<-c(mixmodeldf[[I]][1],mixmodeldf[[I]][3],mixmodeldf[[I]][2])} # puts the 0 in the right spot of the 7-12 mixes.
+for(I in 1:18){mixmodeldf[[I]]<-mixmodeldf[[I]]/sum(mixmodeldf[[I]])} # Normalize to 1.
+mixmodeldf<-as.data.frame(matrix(unlist(unlist(mixmodeldf)),ncol = 3,byrow = TRUE))
+colnames(mixmodeldf)<-c("LM","L","M")
+expresults<-c(rep(2,12),rep(0,6),rep(-1,6),rep(0,6),rep(0.5,6),rep(0,6),rep(-1,6),rep(0.5,6)) #Expected Output of the mixmodeldf.
+dfe<-mixmodeldf-expresults # deviation from expected...again, not super general
+rownames(dfe)<-expdesign$sample
+ggplot2::ggplot(data=reshape2::melt(dfe))+ggplot2::geom_point(ggplot2::aes(x=Var1,y=value,col=Var2))+ggplot2::ylim(c(-1,1))+ggplot2::theme_bw(base_size=12)+ggplot2::ylab("Deviation from Predicted")
+# TODO: make this more amenable to designs that are not named exactly the same as mine (eg: Replace MM_Sx with terms b/o expdesign$sample)
+# TODO: Troubleshoot the [relatively minor] differences between these results and kallisto results.  The mRNA fractions in particular vary somewhat markedly [albeit with the same trends]
+# TODO: replace  this lengthy repetitive code with automatic handling in mixmetrics. [but it'll take much longer to implement, so...easy manual for now!]
+# mixobj<-mixturesolutions::mixmetrics(mrnatype = "ercc",prenormalized = TRUE,modeltype="threemix",componentnames=c("LM","M","L"),mixnames = c("LM","M","L"),indf = mastercount,dds=expdesign,trueproportions = data.frame(L=c(2,-1,0),M=c(2,0,-1),LM=c(0,.5,.5)))
 # 
+```
+Fig. N shows the deviation of the modeled coefficients from the baseline expectations. In the prelim experiment, there is a minor but consistent trend that the mix2 and mix1 samples within a replicate pair cluster.  This is due to the mRNA fraction calculation, which assumes an exactly equal amount of spike-in added to each sample[apparently not the case in that experiment].
+
+```{R}
 ```
 And finally just for posterity...
 ```{r}
