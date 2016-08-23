@@ -79,16 +79,26 @@ res8<-results(dds,name="mixLM.sirvspikenone")# There should be none..
 
 ## And now to do fun things to collect the appropriate demonstrations....
 # Table of Number of padjs <0.05 outside of the 'expected' range/value... 
-
+ugly<-rbind(summary(res$padj<0.05),summary(res2$padj<0.05),summary(res3$padj<0.05),summary(res4$padj<0.05),
+            summary(res5$padj<0.05),summary(res6$padj<0.05),summary(res7$padj<0.05),summary(res8$padj<0.05))
+ugly<-as.data.frame(ugly[,2:4])
+ugly<-cbind(ugly,rbind(summary(transtype[res$padj<0.05]),summary(transtype[res2$padj<0.05]),summary(transtype[res3$padj<0.05]),summary(transtype[res4$padj<0.05])
+                       ,summary(transtype[res5$padj<0.05]),summary(transtype[res6$padj<0.05]),summary(transtype[res7$padj<0.05]),summary(transtype[res8$padj<0.05])))
+transtype<-c(rep("endogenous",length(res$baseMean)))
+transtype[isercc]<-"ERCC"
+transtype[issirv]<-"SIRV"
+transtype<-as.factor(transtype)
+rownames(ugly)<-c("BetweenMix","ERCC M1 vs M2", "SIRV E2 vs E1","SIRV E1 vs None","SIRV E2 vs None", "MixM::SIRVE2","MixLM::SIRVE2","MixLM::noSIRV")
+ugly[,c(3,1,2,4,6,5)]
+```
+I don't have a great interpretation of these results, but they're in a table.
+```{R}
 # Collect a few useful vectors
 spikepattern<-"^SIRV|^DQ|^EN[0-9]" # TODO: update for sequins + pombe once the correct reference exists 
 isercc<-grep("^DQ|EN",mastercounts$transcript_id)
 issirv<-grep("SIRV",mastercounts$transcript_id)
 isspike<-c(issirv,isercc)
 spikevec<-c(rep(0,length(rld)))
-transtype<-c(rep("endogenous",length(rld)))
-transtype[isercc]<-"ERCC"
-transtype[issirv]<-"SIRV"
 spikevec[isspike]<-1
 
 theme_set(theme_bw(base_size=18))
