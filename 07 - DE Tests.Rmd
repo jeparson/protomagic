@@ -2,7 +2,9 @@
 title: "07 - DE Testing"
 author: "jerod"
 date: "June 29, 2016"
-output: html_document
+output: 
+  html_document: 
+    code_folding: hide
 ---
 
 ```{r setup, include=FALSE}
@@ -13,12 +15,15 @@ requirelist(bcpackages=c("S4Vectors","GenomicFeatures","limma","SummarizedExperi
             ghpackages = "jeparson/mixturesolutions",crpackages = c("ggplot2","plotly"))
 experimentaldesignfile="SampleDesign.csv"
 ```
-
-Now to calculate differential expression.
-
-We need to make a useful R object with all of the experimental data in it.
+## Setup:
+  Analysis begins by reading the same count table.
 ```{r,echo=TRUE}
 # The counts
+# PRODUCTION:  Make this read from SBG directly...
+# metadatatable <- read.table(file="metadatatable.txt",sep=",",stringsAsFactors = FALSE,header = TRUE,colClasses = c(rep("character",10)))
+# Labid<-levels(as.factor(metadatatable$investigation))
+# fileobj<- findfile(name=paste0(Labid,"_Transcript_Counts"))
+# mastercounts<-read.csv(fileobj$download_url()[[1]])
 mastertable<-"tools/tests/NIST_MM1_Transcript_Counts.csv"
 mastercounts<-read.csv(mastertable)
 mfrac<-calcmrnafracgeneral(mastercounts,spikeID="^DQ|^EN[0-9]") #spikeID is for the transcript names: These patterns match the ERCCs.  This prefers to be done before integer rounding...
@@ -31,23 +36,33 @@ mastercounts<-mastercounts[,c("transcript_id",as.character(expdesign$sample))] #
 
 # The metadata 
 ```
-Just to double check that there are no significant amounts of SIRVs present in the samples
-where we didn't add SIRVs: in prelim: 5,6,11,12,17,18
+## Spike-in Spot Checks.
+
 ```{r Sanity Check}
 # Expectation NOSIRV: S11/S18/S5/S12/S6/S17: Perfect 
-colSums(mastercounts[grep("SIRV",mastercounts$transcript_id),2:length(mastercounts)])>(colSums(mastercounts[,2:length(mastercounts)])*0.01)
+spikeprop<-round(colSums(mastercounts[grep("SIRV",mastercounts$transcript_id),2:length(mastercounts)])/colSums(mastercounts[,2:length(mastercounts)]),digits=4)
+echeck<-colSums(mastercounts[grep("SIRV",mastercounts$transcript_id),2:length(mastercounts)])>(colSums(mastercounts[,2:length(mastercounts)])*0.0005)
+expectation<-c(rep(c(rep(TRUE,4),rep(FALSE,2)),3))
+data.frame(ExpectSIRV=expectation,ObserveSIRV=echeck)
+#in prelim: 5,6,11,12,17,18 should have FALSE, indicating less than 0.05% of the total counts belonging to SIRVs.
 ```
+Just to double check that there are no significant amounts of SIRVs present in the samples
+where we didn't add SIRVs: 
+Actual proportions are below.
 
-We then need to do DE testing of various pairwise comparisons.
+## DE testing 
 
-```{r,echo=FALSE}
+```{r Differential expression Testing [long]}
 dds<-DESeqDataSetFromMatrix(mastercounts[,2:length(mastercounts)],
                             colData = expdesign[1:18,],
                             design = ~ mix + erccspike + sirvspike + sirvspike:mix) 
 # the interaction term being the relevant measure of interference
-dds<-DESeq(dds)
+dds<-DESeq(dds,quiet=TRUE,fitType='local')
 rownames(dds)<-mastercounts[,1]
 ```
+
+## Heat Map
+
 ```{r}
 
 library("pheatmap")
@@ -62,11 +77,19 @@ pheatmap(sampleDistMatrix,
          clustering_distance_rows=sampleDists,
          clustering_distance_cols=sampleDists,
          col=colors)
+```
+
+A heatmap of the samples should make a checkerboard of the 3 mixes and be subclustered on the 3 different SIRV mixes.
+
+## Principle Components Analysis
+```{R PCA}
 plotPCA(rld,intgroup=c("mix","sirvspike"))
 ```
-A heatmap of the samples should make a checkerboard of the 3 mixes and be subclustered on the 3 different SIRV mixes.
-A PCA plot should show a similar 3x3 pattern, with the first PC being the mix and the second PC being the spike-ins [sirvs vary more than erccs in prelim, as present/absent trumps 2-fold difference]
-```{r}
+
+The expectation is that a PCA plot should show a similar 3x3 pattern, with the first PC being the mix and the second PC being the spike-ins [sirvs vary more than erccs in prelim, as present/absent trumps 2-fold difference]
+
+## Differential Expression Analysis
+```{r Differential Expression Analysis}
 ##TODO:  replace all of the quoted things here with the appropriate references to the expdesign file.
 res<-results(dds,contrast = c("mix","M","L")) # There should be a great deal of DE
 res2<-results(dds,contrast=c("erccspike","Mix1","Mix2")) # There should be very little..
@@ -82,17 +105,6 @@ res8<-results(dds,name="mixLM.sirvspikenone")# There should be none..
 ugly<-rbind(summary(res$padj<0.05),summary(res2$padj<0.05),summary(res3$padj<0.05),summary(res4$padj<0.05),
             summary(res5$padj<0.05),summary(res6$padj<0.05),summary(res7$padj<0.05),summary(res8$padj<0.05))
 ugly<-as.data.frame(ugly[,2:4])
-ugly<-cbind(ugly,rbind(summary(transtype[res$padj<0.05]),summary(transtype[res2$padj<0.05]),summary(transtype[res3$padj<0.05]),summary(transtype[res4$padj<0.05])
-                       ,summary(transtype[res5$padj<0.05]),summary(transtype[res6$padj<0.05]),summary(transtype[res7$padj<0.05]),summary(transtype[res8$padj<0.05])))
-transtype<-c(rep("endogenous",length(res$baseMean)))
-transtype[isercc]<-"ERCC"
-transtype[issirv]<-"SIRV"
-transtype<-as.factor(transtype)
-rownames(ugly)<-c("BetweenMix","ERCC M1 vs M2", "SIRV E2 vs E1","SIRV E1 vs None","SIRV E2 vs None", "MixM::SIRVE2","MixLM::SIRVE2","MixLM::noSIRV")
-ugly[,c(3,1,2,4,6,5)]
-```
-I don't have a great interpretation of these results, but they're in a table.
-```{R}
 # Collect a few useful vectors
 spikepattern<-"^SIRV|^DQ|^EN[0-9]" # TODO: update for sequins + pombe once the correct reference exists 
 isercc<-grep("^DQ|EN",mastercounts$transcript_id)
@@ -100,42 +112,68 @@ issirv<-grep("SIRV",mastercounts$transcript_id)
 isspike<-c(issirv,isercc)
 spikevec<-c(rep(0,length(rld)))
 spikevec[isspike]<-1
+transtype<-c(rep("endogenous",length(res$baseMean)))
+transtype[isercc]<-"ERCC"
+transtype[issirv]<-"SIRV"
+transtype<-as.factor(transtype)
+ugly<-cbind(ugly,rbind(summary(transtype[res$padj<0.05]),summary(transtype[res2$padj<0.05]),summary(transtype[res3$padj<0.05]),summary(transtype[res4$padj<0.05])
+                       ,summary(transtype[res5$padj<0.05]),summary(transtype[res6$padj<0.05]),summary(transtype[res7$padj<0.05]),summary(transtype[res8$padj<0.05])))
+rownames(ugly)<-c("BetweenMixes","ERCC M1 vs M2", "SIRV E2 vs E1","SIRV E1 vs None","SIRV E2 vs None", "MixM::SIRVE2","MixLM::SIRVE2","MixLM::noSIRV")
+ugly[,c(3,1,2,4,6,5)]
+```
 
+I don't have a great interpretation of these results, but they're in a table.
+
+```{R}
 theme_set(theme_bw(base_size=18))
 a<-ggplot(data=as.data.frame(res2))+
   geom_point(aes(x=log2(baseMean),y=log2FoldChange,col=padj<0.05,
                  size=as.numeric(1+spikevec),pch=as.factor((spikevec)))) # Easy MA plots.  
-plotly::ggplotly(a)
+#plotly::ggplotly(a) # MA plots are using up way too much RAM via ggplotly .  Too many points!
 ```
-The DE results should show that there are no DEG between samples that aren't different [besides the spikes]
-```{r}
-test<-res4[which(res4$padj<0.05),] #other than SIRVs, nothing should be DE 
-hist(test[grep("SIRV|^DQ|^EN[0-9]",rownames(test),invert=TRUE),]$log2FoldChange) # is there a bias in the direction of fold changes?  If SIRVs were interfering...
 
+The DE results should show that there are no DEG between samples that aren't different [besides the spikes]
+
+```{r}
+#test<-res4[which(res4$padj<0.05),] #other than SIRVs, nothing should be DE 
+#hist(test[grep("SIRV|^DQ|^EN[0-9]",rownames(test),invert=TRUE),]$log2FoldChange) # is there a bias in the direction of fold changes?  If SIRVs were interfering...
+# This makes an uninformative histogram with awful figure aesthetics.
 ```
+
+## Variance vs Concentration: 
 
 ```{R Variance vs Concentration}
 # Variance vs Concentration [spikes vs endo]
 vvc<-limma::voom(mastercounts[rowSums(mastercounts[,c(2:19)])>32,c(2:19)],save.plot=TRUE)
 vvc$voom.col<-spikevec[rowSums(mastercounts[,c(2:19)])>32]
+head(spikevec[grep("^DQ",mastercounts$transcript_id)]) 
+head(vvc$voom.col)
+summary(as.factor(vvc$voom.col))
+
 c<-ggplot()+
   geom_point(aes(x=vvc$voom.xy$x,y=vvc$voom.xy$y,
   col=as.factor(vvc$voom.col),size=7^(vvc$voom.col)*0.2))+
-  scale_size_identity()
-plotly::ggplotly(c)
+  scale_size_identity()+
+  labs(xlab="log2(Conc)",ylab="sqrt(SD)")
+#plotly::ggplotly(c)
+
+#c
 ```
+
 The seventeen radial lines correspond to the low-integer counts in each sample pairing.  
+
 ```{R CofD}
 # Coefficient of Deviation [spikes vs endo]
 ```
 ```{R}
 # Binned apparent LogFoldChanges for endogenous transcripts vs Spike-ins
-ggplot(data=data.frame(LFC=res2$log2FoldChange,SV=transtype))+
-  geom_histogram(aes(x=LFC))+facet_wrap(~SV,scales = "free_y")
+suppressWarnings(ggplot(data=data.frame(LFC=res2$log2FoldChange,SV=transtype))+
+  geom_histogram(aes(x=LFC))+facet_wrap(~SV,scales = "free_y"))
 
 # This needs some work, but it's a start...Theory being that in res2 [mix1 vs mix2] there should be no endogenous DE
 # or SIRV DE but substantial ERCC DE[in the expected bins, which ought to bemanually set]
 ```
+
 ```{R "Mixture Analysis"}
 # RMSD from mixture model is unchanged:
 # General formula:  Sample / Mfrac[Self]* Mfrac [opposite.of.self] ~ Double + Nonself 
@@ -176,10 +214,10 @@ colnames(mixmodeldf)<-c("LM","L","M")
 expresults<-c(rep(2,12),rep(0,6),rep(-1,6),rep(0,6),rep(0.5,6),rep(0,6),rep(-1,6),rep(0.5,6)) #Expected Output of the mixmodeldf.
 dfe<-mixmodeldf-expresults # deviation from expected...again, not super general
 rownames(dfe)<-expdesign$sample
-ggplot(data=reshape2::melt(dfe))+
+suppressWarnings(ggplot(data=reshape2::melt(as.matrix(dfe)))+
   geom_point(aes(x=Var1,y=value,col=Var2))+
   ylim(c(-1,1))+theme_bw(base_size=12)+
-  ylab("Deviation from Predicted")
+  ylab("Deviation from Predicted"))
 
 # TODO: make this more amenable to designs that are not named exactly the same as mine (eg: Replace MM_Sx with terms b/o expdesign$sample)
 # TODO: Troubleshoot the [relatively minor] differences between these results and kallisto results.  The mRNA fractions in particular vary somewhat markedly [albeit with the same trends]
@@ -187,6 +225,7 @@ ggplot(data=reshape2::melt(dfe))+
 # mixobj<-mixturesolutions::mixmetrics(mrnatype = "ercc",prenormalized = TRUE,modeltype="threemix",componentnames=c("LM","M","L"),mixnames = c("LM","M","L"),indf = mastercount,dds=expdesign,trueproportions = data.frame(L=c(2,-1,0),M=c(2,0,-1),LM=c(0,.5,.5)))
 # 
 ```
+
 Fig. N shows the deviation of the modeled coefficients from the baseline expectations. In the prelim experiment, there is a minor but consistent trend that the mix2 and mix1 samples within a replicate pair cluster.  This is due to the mRNA fraction calculation, which assumes an exactly equal amount of spike-in added to each sample[apparently not the case in that experiment].
 
 ```{R}
