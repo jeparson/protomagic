@@ -9,7 +9,8 @@ output: html_document
 knitr::opts_chunk$set(echo = FALSE)
 knitr::opts_chunk$set(cache = TRUE)#have to cache for some of this DE to be iteratively useful.
 source("ConvenienceFunctions.R")
-requirelist(bcpackages=c("S4Vectors","GenomicFeatures","limma","SummarizedExperiment","DESeq2"),ghpackages = "jeparson/mixturesolutions",crpackages = c("ggplot2","plotly"))
+requirelist(bcpackages=c("S4Vectors","GenomicFeatures","limma","SummarizedExperiment","DESeq2"),
+            ghpackages = "jeparson/mixturesolutions",crpackages = c("ggplot2","plotly"))
 experimentaldesignfile="SampleDesign.csv"
 ```
 
@@ -40,7 +41,10 @@ colSums(mastercounts[grep("SIRV",mastercounts$transcript_id),2:length(mastercoun
 We then need to do DE testing of various pairwise comparisons.
 
 ```{r,echo=FALSE}
-dds<-DESeqDataSetFromMatrix(mastercounts[,2:length(mastercounts)],colData = expdesign[1:18,],design = ~ mix + erccspike + sirvspike + sirvspike:mix) # the interaction term being the relevant measure of interference
+dds<-DESeqDataSetFromMatrix(mastercounts[,2:length(mastercounts)],
+                            colData = expdesign[1:18,],
+                            design = ~ mix + erccspike + sirvspike + sirvspike:mix) 
+# the interaction term being the relevant measure of interference
 dds<-DESeq(dds)
 rownames(dds)<-mastercounts[,1]
 ```
@@ -82,9 +86,15 @@ isercc<-grep("^DQ|EN",mastercounts$transcript_id)
 issirv<-grep("SIRV",mastercounts$transcript_id)
 isspike<-c(issirv,isercc)
 spikevec<-c(rep(0,length(rld)))
+transtype<-c(rep("endogenous",length(rld)))
+transtype[isercc]<-"ERCC"
+transtype[issirv]<-"SIRV"
 spikevec[isspike]<-1
+
 theme_set(theme_bw(base_size=18))
-a<-ggplot(data=as.data.frame(res2))+geom_point(aes(x=log2(baseMean),y=log2FoldChange,col=padj<0.05,size=as.numeric(1+spikevec),pch=as.factor((spikevec)))) # Easy MA plots.  
+a<-ggplot(data=as.data.frame(res2))+
+  geom_point(aes(x=log2(baseMean),y=log2FoldChange,col=padj<0.05,
+                 size=as.numeric(1+spikevec),pch=as.factor((spikevec)))) # Easy MA plots.  
 plotly::ggplotly(a)
 ```
 The DE results should show that there are no DEG between samples that aren't different [besides the spikes]
@@ -96,19 +106,33 @@ hist(test[grep("SIRV|^DQ|^EN[0-9]",rownames(test),invert=TRUE),]$log2FoldChange)
 
 ```{R Variance vs Concentration}
 # Variance vs Concentration [spikes vs endo]
-limma::voom(mastercounts[rowSums(mastercounts[,2:19])>32,2:19],plot=TRUE)
+vvc<-limma::voom(mastercounts[rowSums(mastercounts[,c(2:19)])>32,c(2:19)],save.plot=TRUE)
+vvc$voom.col<-spikevec[rowSums(mastercounts[,c(2:19)])>32]
+c<-ggplot()+
+  geom_point(aes(x=vvc$voom.xy$x,y=vvc$voom.xy$y,
+  col=as.factor(vvc$voom.col),size=7^(vvc$voom.col)*0.2))+
+  scale_size_identity()
+plotly::ggplotly(c)
+```
+The seventeen radial lines correspond to the low-integer counts in each sample pairing.  
+```{R CofD}
+# Coefficient of Deviation [spikes vs endo]
 ```
 ```{R}
-# Coefficient of Deviation [spikes vs endo]
-
 # Binned apparent LogFoldChanges for endogenous transcripts vs Spike-ins
+ggplot(data=data.frame(LFC=res2$log2FoldChange,SV=transtype))+
+  geom_histogram(aes(x=LFC))+facet_wrap(~SV,scales = "free_y")
 
+# This needs some work, but it's a start...Theory being that in res2 [mix1 vs mix2] there should be no endogenous DE
+# or SIRV DE but substantial ERCC DE[in the expected bins, which ought to bemanually set]
+```
+```{R "Mixture Analysis"}
 # RMSD from mixture model is unchanged:
 # General formula:  Sample / Mfrac[Self]* Mfrac [opposite.of.self] ~ Double + Nonself 
 # Double formula:  ??
-```
-```{R "Mixture Analysis"}
-mfrac<-c(mfrac,Mmix=mean(mfrac[names(mfrac)%in%expdesign$sample[expdesign$mix=="M"]]),Lmix=mean(mfrac[names(mfrac)%in%expdesign$sample[expdesign$mix=="L"]]),LMmix=mean(mfrac[names(mfrac)%in%expdesign$sample[expdesign$mix=="LM"]]))
+mfrac<-c(mfrac,Mmix=mean(mfrac[names(mfrac)%in%expdesign$sample[expdesign$mix=="M"]]),
+         Lmix=mean(mfrac[names(mfrac)%in%expdesign$sample[expdesign$mix=="L"]]),
+         LMmix=mean(mfrac[names(mfrac)%in%expdesign$sample[expdesign$mix=="LM"]]))
 # Generates an average of each mix to model against, avoiding (or highlighting?) any effects due to 'bad' samples 
 mastercounts$Mmix<-rowMeans(mastercounts[,colnames(mastercounts)%in%expdesign$sample[expdesign$mix=="M"]])
 mastercounts$Lmix<-rowMeans(mastercounts[,colnames(mastercounts)%in%expdesign$sample[expdesign$mix=="L"]])
@@ -142,7 +166,11 @@ colnames(mixmodeldf)<-c("LM","L","M")
 expresults<-c(rep(2,12),rep(0,6),rep(-1,6),rep(0,6),rep(0.5,6),rep(0,6),rep(-1,6),rep(0.5,6)) #Expected Output of the mixmodeldf.
 dfe<-mixmodeldf-expresults # deviation from expected...again, not super general
 rownames(dfe)<-expdesign$sample
-ggplot2::ggplot(data=reshape2::melt(dfe))+ggplot2::geom_point(ggplot2::aes(x=Var1,y=value,col=Var2))+ggplot2::ylim(c(-1,1))+ggplot2::theme_bw(base_size=12)+ggplot2::ylab("Deviation from Predicted")
+ggplot(data=reshape2::melt(dfe))+
+  geom_point(aes(x=Var1,y=value,col=Var2))+
+  ylim(c(-1,1))+theme_bw(base_size=12)+
+  ylab("Deviation from Predicted")
+
 # TODO: make this more amenable to designs that are not named exactly the same as mine (eg: Replace MM_Sx with terms b/o expdesign$sample)
 # TODO: Troubleshoot the [relatively minor] differences between these results and kallisto results.  The mRNA fractions in particular vary somewhat markedly [albeit with the same trends]
 # TODO: replace  this lengthy repetitive code with automatic handling in mixmetrics. [but it'll take much longer to implement, so...easy manual for now!]
