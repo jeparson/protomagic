@@ -107,10 +107,10 @@ ugly<-rbind(summary(res$padj<0.05),summary(res2$padj<0.05),summary(res3$padj<0.0
 ugly<-as.data.frame(ugly[,2:4])
 # Collect a few useful vectors
 spikepattern<-"^SIRV|^DQ|^EN[0-9]" # TODO: update for sequins + pombe once the correct reference exists 
-isercc<-grep("^DQ|EN",mastercounts$transcript_id)
+isercc<-grep("^DQ|^EN[0-9]",mastercounts$transcript_id)
 issirv<-grep("SIRV",mastercounts$transcript_id)
 isspike<-c(issirv,isercc)
-spikevec<-c(rep(0,length(rld)))
+spikevec<-c(rep(0,length(res2$padj)))
 spikevec[isspike]<-1
 transtype<-c(rep("endogenous",length(res$baseMean)))
 transtype[isercc]<-"ERCC"
@@ -120,16 +120,21 @@ ugly<-cbind(ugly,rbind(summary(transtype[res$padj<0.05]),summary(transtype[res2$
                        ,summary(transtype[res5$padj<0.05]),summary(transtype[res6$padj<0.05]),summary(transtype[res7$padj<0.05]),summary(transtype[res8$padj<0.05])))
 rownames(ugly)<-c("BetweenMixes","ERCC M1 vs M2", "SIRV E2 vs E1","SIRV E1 vs None","SIRV E2 vs None", "MixM::SIRVE2","MixLM::SIRVE2","MixLM::noSIRV")
 ugly[,c(3,1,2,4,6,5)]
+## TODO: Add a # of non-NA SIRVS/ERCCs 
+## Make All pairwise comparisons & add to table.
 ```
 
 I don't have a great interpretation of these results, but they're in a table.
 
-```{R}
+```{R MA Plot}
 theme_set(theme_bw(base_size=18))
 a<-ggplot(data=as.data.frame(res2))+
   geom_point(aes(x=log2(baseMean),y=log2FoldChange,col=padj<0.05,
-                 size=as.numeric(1+spikevec),pch=as.factor((spikevec)))) # Easy MA plots.  
-#plotly::ggplotly(a) # MA plots are using up way too much RAM via ggplotly .  Too many points!
+                 size=as.numeric(1+spikevec),pch=as.factor((spikevec))))+
+  scale_size_identity()# Easy MA plots.  
+# plotly::ggplotly(a) # MA plots are using up way too much RAM via ggplotly .  Too many points!
+a
+# Make All MA plots & find similar classes / patterns 
 ```
 
 The DE results should show that there are no DEG between samples that aren't different [besides the spikes]
@@ -146,8 +151,7 @@ The DE results should show that there are no DEG between samples that aren't dif
 # Variance vs Concentration [spikes vs endo]
 vvc<-limma::voom(mastercounts[rowSums(mastercounts[,c(2:19)])>32,c(2:19)],save.plot=TRUE)
 vvc$voom.col<-spikevec[rowSums(mastercounts[,c(2:19)])>32]
-head(spikevec[grep("^DQ",mastercounts$transcript_id)]) 
-head(vvc$voom.col)
+summary(as.factor(spikevec))
 summary(as.factor(vvc$voom.col))
 
 c<-ggplot()+
@@ -165,14 +169,17 @@ The seventeen radial lines correspond to the low-integer counts in each sample p
 ```{R CofD}
 # Coefficient of Deviation [spikes vs endo]
 ```
+## Fold Change Distributions
 ```{R}
 # Binned apparent LogFoldChanges for endogenous transcripts vs Spike-ins
-suppressWarnings(ggplot(data=data.frame(LFC=res2$log2FoldChange,SV=transtype))+
-  geom_histogram(aes(x=LFC))+facet_wrap(~SV,scales = "free_y"))
-
+suppressWarnings(suppressMessages(ggplot(data=data.frame(LFC=res2$log2FoldChange,SV=transtype))+
+  geom_histogram(aes(x=LFC))+facet_wrap(~SV,scales = "free_y")))
+# Make this a density plot instead with alpha and colors: 
 # This needs some work, but it's a start...Theory being that in res2 [mix1 vs mix2] there should be no endogenous DE
 # or SIRV DE but substantial ERCC DE[in the expected bins, which ought to bemanually set]
 ```
+
+## Mixture Analysis
 
 ```{R "Mixture Analysis"}
 # RMSD from mixture model is unchanged:
@@ -214,10 +221,14 @@ colnames(mixmodeldf)<-c("LM","L","M")
 expresults<-c(rep(2,12),rep(0,6),rep(-1,6),rep(0,6),rep(0.5,6),rep(0,6),rep(-1,6),rep(0.5,6)) #Expected Output of the mixmodeldf.
 dfe<-mixmodeldf-expresults # deviation from expected...again, not super general
 rownames(dfe)<-expdesign$sample
-suppressWarnings(ggplot(data=reshape2::melt(as.matrix(dfe)))+
+suppressWarnings(suppressMessages(ggplot(data=reshape2::melt(as.matrix(dfe)))+
   geom_point(aes(x=Var1,y=value,col=Var2))+
   ylim(c(-1,1))+theme_bw(base_size=12)+
-  ylab("Deviation from Predicted"))
+  ylab("Deviation from Predicted")))
+# Relabel x axis  & legend & make relative deviation instead of absolute 
+# Collapse into a boxplot for each mix 
+# Bring in the kallisto count table & 
+# compare alignment/reference difference between kallisto and star 
 
 # TODO: make this more amenable to designs that are not named exactly the same as mine (eg: Replace MM_Sx with terms b/o expdesign$sample)
 # TODO: Troubleshoot the [relatively minor] differences between these results and kallisto results.  The mRNA fractions in particular vary somewhat markedly [albeit with the same trends]
