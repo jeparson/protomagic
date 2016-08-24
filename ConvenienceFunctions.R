@@ -26,7 +26,7 @@ requirelist<-function(crpackages=NULL,bcpackages=NULL,ghpackages=NULL,quietly=TR
      devtools::install_github(repo = ghpackages[!ghpackages%in%plist])
     }
   }
-  for(I in c(crpackages,bcpackages,ghpackages)){
+  for(I in c(crpackages,bcpackages,ghlist)){
     require(I,quietly=quietly,character.only=TRUE)
   }
 } # Makes a list of packages needed within a script.  Installs if needed, then loads.
