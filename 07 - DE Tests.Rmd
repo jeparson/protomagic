@@ -59,6 +59,22 @@ dds<-DESeqDataSetFromMatrix(mastercounts[,2:length(mastercounts)],
 # the interaction term being the relevant measure of interference
 dds<-DESeq(dds,quiet=TRUE,fitType='local')
 rownames(dds)<-mastercounts[,1]
+deL<-DESeqDataSetFromMatrix(mastercounts[,colnames(mastercounts)%in%expdesign$sample[expdesign$mix=="L"]],
+                             colData=expdesign[expdesign$mix=="L",],
+                             design= ~ sirvspike)
+deL<-DESeq(deL,quiet=TRUE,fitType='local')
+deM<-DESeqDataSetFromMatrix(mastercounts[,colnames(mastercounts)%in%expdesign$sample[expdesign$mix=="M"]],
+                             colData=expdesign[expdesign$mix=="M",],
+                             design= ~ sirvspike)
+deM<-DESeq(deM,quiet=TRUE,fitType='local')
+
+deLM<-DESeqDataSetFromMatrix(mastercounts[,colnames(mastercounts)%in%expdesign$sample[expdesign$mix=="LM"]],
+                             colData=expdesign[expdesign$mix=="LM",],
+                             design= ~ sirvspike)
+deLM<-DESeq(deLM,quiet=TRUE,fitType='local')
+
+
+
 ```
 
 ## Heat Map
@@ -89,7 +105,7 @@ plotPCA(rld,intgroup=c("mix","sirvspike"))
 The expectation is that a PCA plot should show a similar 3x3 pattern, with the first PC being the mix and the second PC being the spike-ins [sirvs vary more than erccs in prelim, as present/absent trumps 2-fold difference]
 
 ## Differential Expression Analysis
-```{r Differential Expression Analysis}
+```{r Differential Expression Analysis: LONG}
 ##TODO:  replace all of the quoted things here with the appropriate references to the expdesign file.
 res<-results(dds,contrast = c("mix","M","L")) # There should be a great deal of DE
 res2<-results(dds,contrast=c("erccspike","Mix1","Mix2")) # There should be very little..
@@ -99,7 +115,22 @@ res5<-results(dds,contrast=c("sirvspike","E2","none")) # There should be very li
 res6<-results(dds,name="mixM.sirvspikeE2")# There should be none..
 res7<-results(dds,name="mixLM.sirvspikeE2")# There should be none..
 res8<-results(dds,name="mixLM.sirvspikenone")# There should be none..
-
+##
+IT<-0;alltbl<-NULL
+for(I in expdesign$sample){
+  IT<-IT+1
+  JT<-0
+  for(J in expdesign$sample){
+    JT<-JT+1
+    if(JT>IT){
+      assign(x = paste0("res",I,"_",J),value = results(deL,contrast=c("sample",I,J)))
+      alltbl<-rbind(alltbl,cbind(summary(get(paste0("res",I,"_",J))$padj<0.05),summary(transtype[get(paste0("res",I,"_",J))$padj<0.05])))
+    }
+  }
+}
+alltbl # Organizing this / classifying it B/O what is 'different' in the pairwise comparison is probabl what i want to try to do here.
+```
+```{R Differential Expression Interpretation/Visualization}
 ## And now to do fun things to collect the appropriate demonstrations....
 # Table of Number of padjs <0.05 outside of the 'expected' range/value... 
 ugly<-rbind(summary(res$padj<0.05),summary(res2$padj<0.05),summary(res3$padj<0.05),summary(res4$padj<0.05),
@@ -130,8 +161,12 @@ I don't have a great interpretation of these results, but they're in a table.
 theme_set(theme_bw(base_size=18))
 a<-ggplot(data=as.data.frame(res2))+
   geom_point(aes(x=log2(baseMean),y=log2FoldChange,col=padj<0.05,
-                 size=as.numeric(1+spikevec),pch=as.factor((spikevec))))+
-  scale_size_identity()# Easy MA plots.  
+  size=as.numeric(1+spikevec),pch=as.factor((spikevec))))+
+  xlab("log2(Conc)")+
+  scale_color_manual(name="Significantly DE (padj < 0.05)",values=c("FALSE" = "red","TRUE" = "blue"))+
+  scale_shape_identity(name="Is Spike-In")
+
+ # Easy MA plots.  
 # plotly::ggplotly(a) # MA plots are using up way too much RAM via ggplotly .  Too many points!
 a
 # Make All MA plots & find similar classes / patterns 
@@ -161,7 +196,7 @@ c<-ggplot()+
   labs(xlab="log2(Conc)",ylab="sqrt(SD)")
 #plotly::ggplotly(c)
 
-#c
+c
 ```
 
 The seventeen radial lines correspond to the low-integer counts in each sample pairing.  
@@ -172,11 +207,13 @@ The seventeen radial lines correspond to the low-integer counts in each sample p
 ## Fold Change Distributions
 ```{R}
 # Binned apparent LogFoldChanges for endogenous transcripts vs Spike-ins
-suppressWarnings(suppressMessages(ggplot(data=data.frame(LFC=res2$log2FoldChange,SV=transtype))+
-  geom_histogram(aes(x=LFC))+facet_wrap(~SV,scales = "free_y")))
+#suppressWarnings(suppressMessages(ggplot(data=data.frame(LFC=res2$log2FoldChange,SV=transtype))+
+#  geom_histogram(aes(x=LFC))+facet_wrap(~SV,scales = "free_y")))
+  suppressWarnings(suppressMessages(ggplot(data=data.frame(LFC=res2$log2FoldChange,SV=transtype))+
+                                      geom_density(aes(x=LFC,col=SV),alpha=0.6)))
 # Make this a density plot instead with alpha and colors: 
-# This needs some work, but it's a start...Theory being that in res2 [mix1 vs mix2] there should be no endogenous DE
-# or SIRV DE but substantial ERCC DE[in the expected bins, which ought to bemanually set]
+# Theory being that in res2 [mix1 vs mix2] there should be no endogenous DE
+# or SIRV DE but substantial ERCC DE[in the expected bins, which ought to be manually set]
 ```
 
 ## Mixture Analysis
@@ -184,7 +221,15 @@ suppressWarnings(suppressMessages(ggplot(data=data.frame(LFC=res2$log2FoldChange
 ```{R "Mixture Analysis"}
 # RMSD from mixture model is unchanged:
 # General formula:  Sample / Mfrac[Self]* Mfrac [opposite.of.self] ~ Double + Nonself 
-# Double formula:  ??
+# Double formula:  LM/Mf[self] ~ L/mL + M/M
+
+# normalize data and cull the weakest links
+mastercounts<-subset(mastercounts,MM_S1>16) # getting rid of low-count data is a lazy way of doing weighted models 
+testn<-edgeR::calcNormFactors(mastercounts[,c(2:19)],method="upperquartile")
+IT<-1
+for(I in testn){IT<-IT+1;mastercounts[,IT]<-mastercounts[,IT]*I}
+# Needs to happen after all the DE testing.   Here seems fine.
+
 mfrac<-c(mfrac,Mmix=mean(mfrac[names(mfrac)%in%expdesign$sample[expdesign$mix=="M"]]),
          Lmix=mean(mfrac[names(mfrac)%in%expdesign$sample[expdesign$mix=="L"]]),
          LMmix=mean(mfrac[names(mfrac)%in%expdesign$sample[expdesign$mix=="LM"]]))
@@ -219,16 +264,20 @@ for(I in 1:18){mixmodeldf[[I]]<-mixmodeldf[[I]]/sum(mixmodeldf[[I]])} # Normaliz
 mixmodeldf<-as.data.frame(matrix(unlist(unlist(mixmodeldf)),ncol = 3,byrow = TRUE))
 colnames(mixmodeldf)<-c("LM","L","M")
 expresults<-c(rep(2,12),rep(0,6),rep(-1,6),rep(0,6),rep(0.5,6),rep(0,6),rep(-1,6),rep(0.5,6)) #Expected Output of the mixmodeldf.
-dfe<-mixmodeldf-expresults # deviation from expected...again, not super general
+dfe<-(mixmodeldf-expresults)/expresults # deviation from expected...again, not super general
+#dfe[is.na(dfe)]<-0 # pesky Divide by zero errors...
 rownames(dfe)<-expdesign$sample
-suppressWarnings(suppressMessages(ggplot(data=reshape2::melt(as.matrix(dfe)))+
-  geom_point(aes(x=Var1,y=value,col=Var2))+
-  ylim(c(-1,1))+theme_bw(base_size=12)+
-  ylab("Deviation from Predicted")))
-# Relabel x axis  & legend & make relative deviation instead of absolute 
+dfe$mix=expdesign$mix
+# This probably works better as a 
+suppressWarnings(suppressMessages(ggplot(data=reshape2::melt((dfe),id.vars="mix"))+
+  geom_jitter(aes(x=mix,y=value,col=variable))+
+  theme_bw(base_size=12)+
+  ylab("Deviation from Predicted")+xlab("Sample")+
+    scale_color_manual(name="Mix Component",values = c("LM"="purple","L"="blue","M"="red"))
+  )
+  )
+# Relabel x axis  & legend 
 # Collapse into a boxplot for each mix 
-# Bring in the kallisto count table & 
-# compare alignment/reference difference between kallisto and star 
 
 # TODO: make this more amenable to designs that are not named exactly the same as mine (eg: Replace MM_Sx with terms b/o expdesign$sample)
 # TODO: Troubleshoot the [relatively minor] differences between these results and kallisto results.  The mRNA fractions in particular vary somewhat markedly [albeit with the same trends]
