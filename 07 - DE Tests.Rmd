@@ -222,9 +222,9 @@ The seventeen radial lines correspond to the low-integer counts in each sample p
 # RMSD from mixture model is unchanged:
 # General formula:  Sample / Mfrac[Self]* Mfrac [opposite.of.self] ~ Double + Nonself 
 # Double formula:  LM/Mf[self] ~ L/mL + M/M
-
+samplelist<-as.character(expdesign$sample)
 # normalize data and cull the weakest links
-mastercounts<-subset(mastercounts,MM_S1>16) # getting rid of low-count data is a lazy way of doing weighted models 
+mastercounts<-subset(mastercounts,samplelist[1]>16) # getting rid of low-count data is a lazy way of doing weighted models 
 testn<-edgeR::calcNormFactors(mastercounts[,c(2:19)],method="upperquartile")
 IT<-1
 for(I in testn){IT<-IT+1;mastercounts[,IT]<-mastercounts[,IT]*I}
@@ -240,24 +240,26 @@ mastercounts$LMmix<-rowMeans(mastercounts[,colnames(mastercounts)%in%expdesign$s
 # These models aren't quite built right; more mfrac corrections are required...
 # Value / SelfValue * OtherValue ~ lm + other / othervalue*selfvalue 
 mixmodeldf<-list(
-  S1=c(coefficients(lm(data=mastercounts,(I(MM_S1/mfrac["MM_S1"]*mfrac["Lmix"]))~LMmix+I(Lmix/mfrac["Lmix"]*mfrac["Mmix"])+0)),0),
-  S2=c(coefficients(lm(data=mastercounts,(I(MM_S2/mfrac["MM_S2"]*mfrac["Lmix"]))~LMmix+I(Lmix/mfrac["Lmix"]*mfrac["Mmix"])+0)),0),
-  S3=c(coefficients(lm(data=mastercounts,(I(MM_S3/mfrac["MM_S3"]*mfrac["Lmix"]))~LMmix+I(Lmix/mfrac["Lmix"]*mfrac["Mmix"])+0)),0),
-  S4=c(coefficients(lm(data=mastercounts,(I(MM_S4/mfrac["MM_S4"]*mfrac["Lmix"]))~LMmix+I(Lmix/mfrac["Lmix"]*mfrac["Mmix"])+0)),0),
-  S5=c(coefficients(lm(data=mastercounts,(I(MM_S5/mfrac["MM_S5"]*mfrac["Lmix"]))~LMmix+I(Lmix/mfrac["Lmix"]*mfrac["Mmix"])+0)),0),
-  S6=c(coefficients(lm(data=mastercounts,(I(MM_S6/mfrac["MM_S6"]*mfrac["Lmix"]))~LMmix+I(Lmix/mfrac["Lmix"]*mfrac["Mmix"])+0)),0),
-  S7=c(coefficients(lm(data=mastercounts,(I(MM_S7/mfrac["MM_S7"]*mfrac["Mmix"]))~LMmix+I(Mmix/mfrac["Mmix"]*mfrac["Lmix"])+0)),0),
-  S8=c(coefficients(lm(data=mastercounts,(I(MM_S8/mfrac["MM_S8"]*mfrac["Mmix"]))~LMmix+I(Mmix/mfrac["Mmix"]*mfrac["Lmix"])+0)),0),
-  S9=c(coefficients(lm(data=mastercounts,(I(MM_S9/mfrac["MM_S9"]*mfrac["Mmix"]))~LMmix+I(Mmix/mfrac["Mmix"]*mfrac["Lmix"])+0)),0),
-  S10=c(coefficients(lm(data=mastercounts,(I(MM_S10/mfrac["MM_S10"]*mfrac["Mmix"]))~LMmix+I(Mmix/mfrac["Mmix"]*mfrac["Lmix"])+0)),0),
-  S11=c(coefficients(lm(data=mastercounts,(I(MM_S11/mfrac["MM_S11"]*mfrac["Mmix"]))~LMmix+I(Mmix/mfrac["Mmix"]*mfrac["Lmix"])+0)),0),
-  S12=c(coefficients(lm(data=mastercounts,(I(MM_S12/mfrac["MM_S12"]*mfrac["Mmix"]))~LMmix+I(Mmix/mfrac["Mmix"]*mfrac["Lmix"])+0)),0),
-  S13=c(0,coefficients(lm(data=mastercounts,I(MM_S13/mfrac["MM_S13"])~I(Lmix/mfrac["Lmix"])+I(Mmix/mfrac["Mmix"])+0))),
-  S14=c(0,coefficients(lm(data=mastercounts,I(MM_S14/mfrac["MM_S14"])~I(Lmix/mfrac["Lmix"])+I(Mmix/mfrac["Mmix"])+0))),
-  S15=c(0,coefficients(lm(data=mastercounts,I(MM_S15/mfrac["MM_S15"])~I(Lmix/mfrac["Lmix"])+I(Mmix/mfrac["Mmix"])+0))),
-  S16=c(0,coefficients(lm(data=mastercounts,I(MM_S16/mfrac["MM_S16"])~I(Lmix/mfrac["Lmix"])+I(Mmix/mfrac["Mmix"])+0))),
-  S17=c(0,coefficients(lm(data=mastercounts,I(MM_S17/mfrac["MM_S17"])~I(Lmix/mfrac["Lmix"])+I(Mmix/mfrac["Mmix"])+0))),
-  S18=c(0,coefficients(lm(data=mastercounts,I(MM_S18/mfrac["MM_S18"])~I(Lmix/mfrac["Lmix"])+I(Mmix/mfrac["Mmix"])+0)))
+  S1=c(coefficients( lm(data=mastercounts,as.formula(paste0("I(",samplelist[1],"/",mfrac[samplelist[1]],"*",mfrac["Lmix"],")","~LMmix+I(Lmix/",mfrac["Lmix"],"*",mfrac["Mmix"],")+0")))),0),
+  S2=c(coefficients( lm(data=mastercounts,as.formula(paste0("I(",samplelist[2],"/",mfrac[samplelist[2]],"*",mfrac["Lmix"],")","~LMmix+I(Lmix/",mfrac["Lmix"],"*",mfrac["Mmix"],")+0")))),0),
+  S3=c(coefficients( lm(data=mastercounts,as.formula(paste0("I(",samplelist[3],"/",mfrac[samplelist[3]],"*",mfrac["Lmix"],")","~LMmix+I(Lmix/",mfrac["Lmix"],"*",mfrac["Mmix"],")+0")))),0),
+  S4=c(coefficients( lm(data=mastercounts,as.formula(paste0("I(",samplelist[4],"/",mfrac[samplelist[4]],"*",mfrac["Lmix"],")","~LMmix+I(Lmix/",mfrac["Lmix"],"*",mfrac["Mmix"],")+0")))
+),0),
+  S5=c(coefficients( lm(data=mastercounts,as.formula(paste0("I(",samplelist[5],"/",mfrac[samplelist[5]],"*",mfrac["Lmix"],")","~LMmix+I(Lmix/",mfrac["Lmix"],"*",mfrac["Mmix"],")+0")))),0),
+  S6=c(coefficients( lm(data=mastercounts,as.formula(paste0("I(",samplelist[6],"/",mfrac[samplelist[6]],"*",mfrac["Lmix"],")","~LMmix+I(Lmix/",mfrac["Lmix"],"*",mfrac["Mmix"],")+0")))
+),0),
+  S7=c(coefficients(lm(data=mastercounts,as.formula(paste0("(I(",samplelist[7],"/",mfrac[samplelist[7]],"*",mfrac["Mmix"],"))~LMmix+I(Mmix/",mfrac["Mmix"],"*",mfrac["Lmix"],")+0")))),0),
+  S8=c(coefficients(lm(data=mastercounts,as.formula(paste0("(I(",samplelist[8],"/",mfrac[samplelist[8]],"*",mfrac["Mmix"],"))~LMmix+I(Mmix/",mfrac["Mmix"],"*",mfrac["Lmix"],")+0")))),0),
+  S9=c(coefficients(lm(data=mastercounts,as.formula(paste0("(I(",samplelist[9],"/",mfrac[samplelist[9]],"*",mfrac["Mmix"],"))~LMmix+I(Mmix/",mfrac["Mmix"],"*",mfrac["Lmix"],")+0")))),0),
+  S10=c(coefficients(lm(data=mastercounts,as.formula(paste0("(I(",samplelist[10],"/",mfrac[samplelist[10]],"*",mfrac["Mmix"],"))~LMmix+I(Mmix/",mfrac["Mmix"],"*",mfrac["Lmix"],")+0")))),0),
+  S11=c(coefficients(lm(data=mastercounts,as.formula(paste0("(I(",samplelist[11],"/",mfrac[samplelist[11]],"*",mfrac["Mmix"],"))~LMmix+I(Mmix/",mfrac["Mmix"],"*",mfrac["Lmix"],")+0")))),0),
+  S12=c(coefficients(lm(data=mastercounts,as.formula(paste0("(I(",samplelist[12],"/",mfrac[samplelist[12]],"*",mfrac["Mmix"],"))~LMmix+I(Mmix/",mfrac["Mmix"],"*",mfrac["Lmix"],")+0")))),0),
+  S13=c(0,coefficients(lm(data=mastercounts,as.formula(paste0("I(",samplelist[13],"/",mfrac[samplelist[13]],")~I(Lmix/",mfrac["Lmix"],")+I(Mmix/",mfrac["Mmix"],")+0"))))),
+  S14=c(0,coefficients(lm(data=mastercounts,as.formula(paste0("I(",samplelist[14],"/",mfrac[samplelist[14]],")~I(Lmix/",mfrac["Lmix"],")+I(Mmix/",mfrac["Mmix"],")+0"))))),
+  S15=c(0,coefficients(lm(data=mastercounts,as.formula(paste0("I(",samplelist[15],"/",mfrac[samplelist[15]],")~I(Lmix/",mfrac["Lmix"],")+I(Mmix/",mfrac["Mmix"],")+0"))))),
+  S16=c(0,coefficients(lm(data=mastercounts,as.formula(paste0("I(",samplelist[16],"/",mfrac[samplelist[16]],")~I(Lmix/",mfrac["Lmix"],")+I(Mmix/",mfrac["Mmix"],")+0"))))),
+  S17=c(0,coefficients(lm(data=mastercounts,as.formula(paste0("I(",samplelist[17],"/",mfrac[samplelist[17]],")~I(Lmix/",mfrac["Lmix"],")+I(Mmix/",mfrac["Mmix"],")+0"))))),
+  S18=c(0,coefficients(lm(data=mastercounts,as.formula(paste0("I(",samplelist[18],"/",mfrac[samplelist[18]],")~I(Lmix/",mfrac["Lmix"],")+I(Mmix/",mfrac["Mmix"],")+0")))))
   )
 for(I in 7:12){mixmodeldf[[I]]<-c(mixmodeldf[[I]][1],mixmodeldf[[I]][3],mixmodeldf[[I]][2])} # puts the 0 in the right spot of the 7-12 mixes.
 for(I in 1:18){mixmodeldf[[I]]<-mixmodeldf[[I]]/sum(mixmodeldf[[I]])} # Normalize to 1.
@@ -278,11 +280,6 @@ suppressWarnings(suppressMessages(ggplot(data=reshape2::melt((dfe),id.vars="mix"
   )
 # Relabel x axis  & legend 
 # Collapse into a boxplot for each mix 
-
-# TODO: make this more amenable to designs that are not named exactly the same as mine (eg: Replace MM_Sx with terms b/o expdesign$sample)
-# TODO: Troubleshoot the [relatively minor] differences between these results and kallisto results.  The mRNA fractions in particular vary somewhat markedly [albeit with the same trends]
-# TODO: replace  this lengthy repetitive code with automatic handling in mixmetrics. [but it'll take much longer to implement, so...easy manual for now!]
-# mixobj<-mixturesolutions::mixmetrics(mrnatype = "ercc",prenormalized = TRUE,modeltype="threemix",componentnames=c("LM","M","L"),mixnames = c("LM","M","L"),indf = mastercount,dds=expdesign,trueproportions = data.frame(L=c(2,-1,0),M=c(2,0,-1),LM=c(0,.5,.5)))
 # 
 ```
 
